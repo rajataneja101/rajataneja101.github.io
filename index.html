@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rajat & Ishika — 20·21 Nov 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<canvas id="fluid"></canvas>
+<div id="grain"></div>
+
+<!-- BLESSING OVERLAY -->
+<div id="bless-overlay" role="dialog" aria-modal="true">
+  <div class="bless-stage">
+    <span class="bless-flourish">✦</span>
+    <div class="bless-eyebrow">A Blessing</div>
+    <h2 class="bless-title">May your love be forever.</h2>
+    <p class="bless-body">
+      May every sunrise find you holding hands.<br>
+      May every storm pass quickly. May joy be a <em>frequent guest</em><br>
+      in the home you build together.
+    </p>
+    <div class="bless-signature">— from all of us</div>
+    <button class="bless-close" id="blessClose">Close</button>
+  </div>
+</div>
+
+<div id="PB"></div>
+
+<div id="LB" role="dialog" aria-modal="true">
+  <button class="lbb" id="LBx">×</button>
+  <button class="lbb" id="LBp">←</button>
+  <img id="LBi" src="" alt="">
+  <button class="lbb" id="LBn">→</button>
+  <div id="LB-info">
+    <div id="LB-info-title"></div>
+    <div id="LB-info-meta"></div>
+  </div>
+  <div id="LBc"></div>
+</div>
+
+<nav id="NAV">
+  <div class="nlogo">R & I</div>
+  <ul class="nlinks">
+    <li><a href="#story">Events</a></li>
+    <li><a href="#venue">Venue</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="h-tag">A Wedding Celebration · 2025</div>
+
+  <div class="hero-stage">
+    <div class="h-name-wrap">
+      <div class="h-name" data-text="Rajat"></div>
+      <div class="h-amp">&amp;</div>
+      <div class="h-name" data-text="Ishika" data-delay="1.3"></div>
+    </div>
+
+    <div class="h-date">November <b>20 — 21</b> · Uday Residency · Rudrapur</div>
+
+    <div class="h-cta-row">
+      <a href="#story" class="h-cta">See the events <span class="h-cta-arrow">→</span></a>
+      <a href="#gallery" class="h-cta ghost">View gallery</a>
+      <button class="h-cta bless" id="blessBtn">Bless the couple <span class="h-cta-arrow">✦</span></button>
+    </div>
+  </div>
+
+  <div class="h-floor-l">20.11.25</div>
+  <div class="h-floor-r">21.11.25</div>
+
+  <div class="h-scroll" onclick="document.getElementById('story').scrollIntoView({behavior:'smooth'})">
+    <div class="h-scroll-icon">↓</div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ══ STORY (sticky scrollytelling) ══ -->
+<section id="story">
+
+  <div class="story-section" data-blob-mood="0">
+    <div class="story-content">
+      <div class="story-eyebrow rv"><span class="day">Day 01</span> · The Beginning</div>
+      <div class="story-bignum rv d1">20</div>
+      <div class="story-name rv d2">Haldi</div>
+      <div class="story-meta rv d3">
+        <span>20 Nov 2025</span><span class="story-meta-dot"></span>
+        <span>Lunch</span><span class="story-meta-dot"></span>
+        <span>Afternoon</span>
+      </div>
+      <p class="story-desc rv d4">The morning of celebration. Turmeric, laughter, and the start of something forever.</p>
+    </div>
+  </div>
+
+  <div class="story-section" data-blob-mood="1">
+    <div class="story-content">
+      <div class="story-eyebrow rv"><span class="day">Day 01</span> · The Evening</div>
+      <div class="story-bignum rv d1">20</div>
+      <div class="story-name rv d2">Sagan</div>
+      <div class="story-meta rv d3">
+        <span>20 Nov 2025</span><span class="story-meta-dot"></span>
+        <span>Dinner</span><span class="story-meta-dot"></span>
+        <span>Evening</span>
+      </div>
+      <p class="story-desc rv d4">As the sun sets, two families come together. Sweets are exchanged, blessings shared.</p>
+    </div>
+  </div>
+
+  <div class="story-section" data-blob-mood="2">
+    <div class="story-content">
+      <div class="story-eyebrow rv"><span class="day">Day 02</span> · The Vows</div>
+      <div class="story-bignum rv d1">21</div>
+      <div class="story-name rv d2">Shaadi</div>
+      <div class="story-meta rv d3">
+        <span>21 Nov 2025</span><span class="story-meta-dot"></span>
+        <span>Lunch</span><span class="story-meta-dot"></span>
+        <span>The Wedding</span>
+      </div>
+      <p class="story-desc rv d4">The day everything changes. Two become one, surrounded by the people they love most.</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ VENUE ══ -->
+<section id="venue">
+  <div class="venue-card rv">
+    <div class="venue-eyebrow">The Venue</div>
+    <div class="venue-name">Uday <em>Residency</em></div>
+    <div class="venue-loc">Rudrapur · Uttarakhand</div>
+    <div class="venue-divider"></div>
+    <div class="venue-meta">
+      <div><div class="vm-label">From</div><div class="vm-val">20 November</div></div>
+      <div><div class="vm-label">To</div><div class="vm-val">21 November</div></div>
+      <div><div class="vm-label">Year</div><div class="vm-val">2025</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ GALLERY ══ -->
+<section id="gallery">
+  <div class="g-header rv">
+    <div class="g-title">Our story<br>in <em>frames</em></div>
+    <div class="g-meta">06 moments</div>
+  </div>
+  <div class="gg rv d1" id="GG">
+    
+    <!-- Photo 1: Main couple photo (wide cinematic) -->
+    <div class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 01 —</div>
+      <div class="gi-expand">↗</div>
+      <!-- Replace this placeholder with: <img src="photos/photo1.jpg" alt="Rajat & Ishika"> -->
+      <div class="gph"><div class="gph-n">i</div><div class="gph-l">Together</div></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <div class="gi-caption">
+        <div class="gi-caption-title">Where it all began</div>
+        <div class="gi-caption-meta">Chapter 01 · The First Glance</div>
+      </div>
+    </div>
+
+    <!-- Photo 2 -->
+    <div class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 02 —</div>
+      <div class="gi-expand">↗</div>
+      <!-- Replace with: <img src="photos/photo2.jpg" alt="Rajat & Ishika"> -->
+      <div class="gph"><div class="gph-n">ii</div><div class="gph-l">Promise</div></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <div class="gi-caption">
+        <div class="gi-caption-title">A quiet promise</div>
+        <div class="gi-caption-meta">Chapter 02 · Just Us</div>
+      </div>
+    </div>
+
+    <!-- Photo 3 -->
+    <div class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 03 —</div>
+      <div class="gi-expand">↗</div>
+      <!-- Replace with: <img src="photos/photo3.jpg" alt="Rajat & Ishika"> -->
+      <div class="gph"><div class="gph-n">iii</div><div class="gph-l">Laughter</div></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <div class="gi-caption">
+        <div class="gi-caption-title">Endless laughter</div>
+        <div class="gi-caption-meta">Chapter 03 · Joy</div>
+      </div>
+    </div>
+
+    <!-- Photo 4 -->
+    <div class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 04 —</div>
+      <div class="gi-expand">↗</div>
+      <!-- Replace with: <img src="photos/photo4.jpg" alt="Rajat & Ishika"> -->
+      <div class="gph"><div class="gph-n">iv</div><div class="gph-l">Adventures</div></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <div class="gi-caption">
+        <div class="gi-caption-title">The adventures</div>
+        <div class="gi-caption-meta">Chapter 04 · Wanderlust</div>
+      </div>
+    </div>
+
+    <!-- Photo 5 -->
+    <div class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 05 —</div>
+      <div class="gi-expand">↗</div>
+      <!-- Replace with: <img src="photos/photo5.jpg" alt="Rajat & Ishika"> -->
+      <div class="gph"><div class="gph-n">v</div><div class="gph-l">Home</div></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <div class="gi-caption">
+        <div class="gi-caption-title">Building a home</div>
+        <div class="gi-caption-meta">Chapter 05 · Us</div>
+      </div>
+    </div>
+
+    <!-- Photo 6: Panoramic (wide bottom) -->
+    <div class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 06 —</div>
+      <div class="gi-expand">↗</div>
+      <!-- Replace with: <img src="photos/photo6.jpg" alt="Rajat & Ishika"> -->
+      <div class="gph"><div class="gph-n">vi</div><div class="gph-l">Forever</div></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <div class="gi-caption">
+        <div class="gi-caption-title">And finally — forever</div>
+        <div class="gi-caption-meta">Chapter 06 · The Vow</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="fb">Rajat <em>&</em> Ishika</div>
+  <div class="fm">20 — 21 November 2025<br>Uday Residency · Rudrapur</div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
