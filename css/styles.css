@@ -43,17 +43,26 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:22px 40px;display:fl
 .hero-stage{text-align:center;padding:0 24px;position:relative;z-index:3}
 
 /* MAIN NAMES — letter by letter reveal */
-.h-name-wrap{position:relative}
+.h-name-wrap{
+  position:relative;
+  display:flex;
+  flex-direction:row;
+  align-items:baseline;
+  justify-content:center;
+  gap:.12em;
+  flex-wrap:nowrap;
+  perspective:1200px;
+}
 
 .h-name{
   font-family:'Instrument Serif',serif;
-  font-size:clamp(96px,17vw,240px);
+  font-size:clamp(72px,13vw,200px);
   font-weight:400;
-  line-height:.95;
+  line-height:1.1;
   letter-spacing:-.04em;
   display:block;
   overflow:hidden;
-  padding-bottom:.06em;
+  padding-bottom:0;
 }
 
 .h-name .ch{
@@ -75,10 +84,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:22px 40px;display:fl
 .h-amp{
   font-family:'Instrument Serif',serif;
   font-style:italic;
-  font-size:clamp(96px,17vw,240px);
+  font-size:clamp(56px,10vw,158px);
   line-height:.95;
   display:block;
-  margin:-.04em 0;
+  margin:0;
   background:linear-gradient(135deg,#ffe5a0 0%,#ff9e7d 35%,#ff7eb3 70%,#c884e8 100%);
   background-size:300% 300%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
@@ -250,7 +259,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:22px 40px;display:fl
 .h-floor-l{position:absolute;bottom:48px;left:40px;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(255,255,255,.4);opacity:0;animation:fadeIn 1s ease forwards 2.5s;z-index:5}
 .h-floor-r{position:absolute;bottom:48px;right:40px;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(255,255,255,.4);opacity:0;animation:fadeIn 1s ease forwards 2.5s;z-index:5}
 
-.h-scroll{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;opacity:0;animation:fadeIn 1s ease forwards 2.7s;z-index:5}
+.h-scroll{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;opacity:0;animation:fadeIn 1s ease forwards 2.7s;z-index:5}
 .h-scroll-icon{width:24px;height:24px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.6);animation:bounce 2s ease-in-out infinite}
 .h-scroll span{font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:rgba(255,255,255,.35)}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
@@ -645,9 +654,27 @@ footer{position:relative;z-index:2;background:linear-gradient(to bottom,transpar
   nav{padding:14px 20px}.nlinks{display:none}
   .h-tag{top:60px;font-size:9px;letter-spacing:.32em}
   .h-tag::before,.h-tag::after{width:16px}
-  .h-floor-l,.h-floor-r{font-size:9px}
+
+  /* Revert to stacked column on mobile */
+  .h-name-wrap{flex-direction:column;align-items:center;gap:0;perspective:none}
+  .h-name{font-size:clamp(64px,14vw,140px)}
+  .h-amp{font-size:clamp(64px,14vw,140px);margin:-.04em 0}
+
+  /* CTA buttons stack vertically */
+  .h-cta-row{
+    flex-direction:column;align-items:stretch;
+    width:100%;max-width:300px;
+    margin-left:auto;margin-right:auto;
+    gap:10px;
+  }
+  .h-cta{justify-content:center;text-align:center}
+  .hero-stage{padding:0 24px}
+
+  /* Floor labels stay at bottom corners; scroll indicator separated */
+  .h-floor-l,.h-floor-r{font-size:9px;bottom:20px}
   .h-floor-l{left:20px}.h-floor-r{right:20px}
-  .h-floor-l,.h-floor-r,.h-scroll{bottom:30px}
+  .h-scroll{bottom:32px}
+
   .story-section{min-height:auto;padding:80px 20px}
   .story-content{text-align:center}
   #venue{padding:80px 20px}
@@ -658,4 +685,15 @@ footer{position:relative;z-index:2;background:linear-gradient(to bottom,transpar
   .gi:nth-child(n){grid-column:auto;aspect-ratio:1/1}
   footer{padding:36px 20px;flex-direction:column;text-align:center}.fm{text-align:center}
   #LBp{left:8px}#LBn{right:8px}
+}
+
+@media(max-width:480px){
+  /* Names scale fluidly all the way down on small phones */
+  .h-name{font-size:clamp(48px,12vw,96px)}
+  .h-amp{font-size:clamp(48px,12vw,96px);margin:-.04em 0}
+  .hero-stage{padding:0 16px}
+
+  /* Keep scroll indicator clearly centered and clear of floor labels */
+  .h-floor-l,.h-floor-r{display:none}
+  .h-scroll{bottom:28px;left:50%;transform:translateX(-50%)}
 }

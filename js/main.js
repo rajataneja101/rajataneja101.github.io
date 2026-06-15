@@ -400,25 +400,30 @@ document.querySelectorAll('.h-cta').forEach(btn=>{
   const names=document.querySelectorAll('.h-name');
   if(!names.length)return;
   function shimmer(el){
-    el.style.transition='background-position 1.8s ease-in-out';
-    el.style.background='linear-gradient(110deg,#fff 0%,#fff 30%,#ffe5a0 45%,#ff9e7d 50%,#ffe5a0 55%,#fff 70%,rgba(255,255,255,.65) 100%)';
-    el.style.backgroundSize='300% 100%';
-    el.style.backgroundPosition='200% 50%';
-    el.style.webkitBackgroundClip='text';
-    el.style.webkitTextFillColor='transparent';
-    el.style.backgroundClip='text';
+    const chars=[...el.querySelectorAll('.ch')];
+    if(!chars.length)return;
+    chars.forEach(ch=>{
+      ch.style.transition='background-position 1.8s ease-in-out';
+      ch.style.background='linear-gradient(110deg,#fff 0%,#fff 30%,#ffe5a0 45%,#ff9e7d 50%,#ffe5a0 55%,#fff 70%,rgba(255,255,255,.65) 100%)';
+      ch.style.backgroundSize='300% 100%';
+      ch.style.backgroundPosition='200% 50%';
+      ch.style.webkitBackgroundClip='text';
+      ch.style.webkitTextFillColor='transparent';
+      ch.style.backgroundClip='text';
+    });
     requestAnimationFrame(()=>{
-      el.style.backgroundPosition='-100% 50%';
+      chars.forEach(ch=>{ ch.style.backgroundPosition='-100% 50%'; });
     });
     setTimeout(()=>{
-      // restore original gradient
-      el.style.background='linear-gradient(180deg,#fff 0%,#fff 50%,rgba(255,255,255,.65) 100%)';
-      el.style.backgroundSize='';
-      el.style.backgroundPosition='';
-      el.style.webkitBackgroundClip='text';
-      el.style.webkitTextFillColor='transparent';
-      el.style.backgroundClip='text';
-      el.style.transition='';
+      chars.forEach(ch=>{
+        ch.style.background='linear-gradient(180deg,#fff 0%,#fff 50%,rgba(255,255,255,.65) 100%)';
+        ch.style.backgroundSize='';
+        ch.style.backgroundPosition='';
+        ch.style.webkitBackgroundClip='text';
+        ch.style.webkitTextFillColor='transparent';
+        ch.style.backgroundClip='text';
+        ch.style.transition='';
+      });
     },2000);
   }
   function loop(){
@@ -579,5 +584,3 @@ document.getElementById('LBp').onclick=()=>navLB(-1);
 document.getElementById('LBn').onclick=()=>navLB(1);
 LB.addEventListener('click',e=>{if(e.target===LB)closeLB();});
 document.addEventListener('keydown',e=>{if(!LB.classList.contains('open'))return;if(e.key==='Escape')closeLB();if(e.key==='ArrowLeft')navLB(-1);if(e.key==='ArrowRight')navLB(1);});
-</script>
-</body>
