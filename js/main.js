@@ -28,31 +28,31 @@
   let mouse={x:.5,y:.5,tx:.5,ty:.5};
   let mood={current:0,target:0};
 
-  // 3 moods — each a different color story
+  // 3 moods — Indian wedding color story
   const MOODS=[
-    // hero — peach/pink/gold (warm sunset)
+    // Haldi — turmeric, marigold, saffron
     [
-      {color:[255,229,160],r:.5},  // gold
-      {color:[255,158,125],r:.45}, // peach
-      {color:[255,126,179],r:.4},  // pink
-      {color:[200,100,220],r:.35}, // purple
-      {color:[255,170,140],r:.4},  // coral
+      {color:[255,165,0],r:.55},   // marigold
+      {color:[255,110,0],r:.48},   // saffron
+      {color:[255,210,60],r:.42},  // turmeric yellow
+      {color:[230,120,20],r:.38},  // deep orange
+      {color:[255,190,80],r:.44},  // golden amber
     ],
-    // sagan — deep pink/purple (evening)
+    // Sagan — crimson, rani pink, deep rose
     [
-      {color:[255,126,179],r:.5},
-      {color:[200,100,220],r:.45},
-      {color:[140,80,200],r:.4},
-      {color:[255,158,125],r:.35},
-      {color:[180,90,180],r:.4},
+      {color:[196,30,58],r:.55},   // crimson
+      {color:[233,30,140],r:.48},  // rani pink
+      {color:[170,20,70],r:.42},   // deep rose
+      {color:[255,60,80],r:.38},   // vivid red
+      {color:[200,80,110],r:.44},  // dusty rose
     ],
-    // shaadi — gold/rose (wedding)
+    // Shaadi — gold, crimson, marigold (the big day)
     [
-      {color:[255,229,160],r:.5},
-      {color:[255,200,140],r:.45},
-      {color:[255,158,125],r:.4},
-      {color:[230,180,100],r:.35},
-      {color:[255,126,179],r:.4},
+      {color:[212,175,55],r:.55},  // gold
+      {color:[196,30,58],r:.48},   // crimson
+      {color:[255,160,0],r:.42},   // marigold
+      {color:[170,120,15],r:.38},  // dark gold
+      {color:[233,30,140],r:.44},  // rani pink
     ],
   ];
 
@@ -81,10 +81,10 @@
     mouse.y+=(mouse.ty-mouse.y)*.04;
     mood.current+=(mood.target-mood.current)*.02;
 
-    ctx.fillStyle='#000';
+    ctx.fillStyle='#FDF6E3';
     ctx.fillRect(0,0,W,H);
 
-    ctx.globalCompositeOperation='lighter';
+    ctx.globalCompositeOperation='source-over';
 
     const m0=Math.floor(mood.current);
     const m1=Math.min(m0+1,MOODS.length-1);
@@ -106,9 +106,9 @@
 
       const cx=b.x*W,cy=b.y*H;
       const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-      grad.addColorStop(0,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.35)`);
-      grad.addColorStop(.3,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.18)`);
-      grad.addColorStop(.6,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.06)`);
+      grad.addColorStop(0,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.22)`);
+      grad.addColorStop(.3,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.12)`);
+      grad.addColorStop(.6,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.04)`);
       grad.addColorStop(1,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},0)`);
 
       ctx.fillStyle=grad;
@@ -119,10 +119,12 @@
 
     ctx.globalCompositeOperation='source-over';
 
-    // vignette
-    const vg=ctx.createRadialGradient(W/2,H/2,W*.3,W/2,H/2,W*.9);
-    vg.addColorStop(0,'rgba(0,0,0,0)');
-    vg.addColorStop(1,'rgba(0,0,0,.7)');
+    // warm subtle vignette — golden-amber edges
+    ctx.globalCompositeOperation='source-over';
+    const vg=ctx.createRadialGradient(W/2,H/2,W*.25,W/2,H/2,W*.9);
+    vg.addColorStop(0,'rgba(253,246,227,0)');
+    vg.addColorStop(.7,'rgba(230,200,160,.06)');
+    vg.addColorStop(1,'rgba(200,150,80,.14)');
     ctx.fillStyle=vg;
     ctx.fillRect(0,0,W,H);
 
@@ -157,7 +159,7 @@ window.addEventListener('scroll',()=>{
 (function(){
   const cv=document.createElement('canvas');
   cv.id='stars';
-  cv.style.cssText='position:fixed;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen';
+  cv.style.cssText='position:fixed;inset:0;z-index:1;pointer-events:none;mix-blend-mode:multiply';
   document.body.appendChild(cv);
   const ctx=cv.getContext('2d');
   let W,H;
@@ -181,7 +183,7 @@ window.addEventListener('scroll',()=>{
       life:1,
       decay:.008+Math.random()*.005,
       tail:[],
-      hue:Math.random()<.5?'255,229,160':Math.random()<.5?'255,158,125':'255,200,180',
+      hue:Math.random()<.4?'196,30,58':Math.random()<.6?'212,140,0':'180,100,20',
     });
   }
 
@@ -279,7 +281,7 @@ document.querySelectorAll('.h-cta').forEach(btn=>{
   resize();window.addEventListener('resize',resize);
 
   let petals=[];
-  const COLORS=['#ffb347','#ff8c42','#ffa07a','#ff7eb3','#ffd700','#e8c87a','#ffbb6c'];
+  const COLORS=['#FF8C00','#C41E3A','#E91E8C','#D4AF37','#FF6B35','#FFD700','#FF4040','#FF9500','#B8860B'];
 
   function burst(x,y,count=14){
     const dpr=Math.min(devicePixelRatio||1,2);
@@ -404,7 +406,7 @@ document.querySelectorAll('.h-cta').forEach(btn=>{
     if(!chars.length)return;
     chars.forEach(ch=>{
       ch.style.transition='background-position 1.8s ease-in-out';
-      ch.style.background='linear-gradient(110deg,#fff 0%,#fff 30%,#ffe5a0 45%,#ff9e7d 50%,#ffe5a0 55%,#fff 70%,rgba(255,255,255,.65) 100%)';
+      ch.style.background='linear-gradient(110deg,#2D0000 0%,#2D0000 28%,#FF8C00 42%,#C41E3A 50%,#FF8C00 58%,#2D0000 72%,rgba(45,0,0,.7) 100%)';
       ch.style.backgroundSize='300% 100%';
       ch.style.backgroundPosition='200% 50%';
       ch.style.webkitBackgroundClip='text';
@@ -416,7 +418,7 @@ document.querySelectorAll('.h-cta').forEach(btn=>{
     });
     setTimeout(()=>{
       chars.forEach(ch=>{
-        ch.style.background='linear-gradient(180deg,#fff 0%,#fff 50%,rgba(255,255,255,.65) 100%)';
+        ch.style.background='linear-gradient(180deg,#2D0000 0%,#6B0010 55%,rgba(139,0,30,.7) 100%)';
         ch.style.backgroundSize='';
         ch.style.backgroundPosition='';
         ch.style.webkitBackgroundClip='text';
