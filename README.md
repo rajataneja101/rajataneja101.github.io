@@ -1,161 +1,95 @@
-# Rajat & Ishika Wedding Invitation
+# Rajat & Ishika — Wedding Invitation
 
-A cinematic, interactive wedding invitation website with fluid gradients, scroll animations, and immersive photo gallery.
+**20 – 21 November 2026 · Uday Residency, Rudrapur, Uttarakhand**
 
-## 📁 Folder Structure
+A single-page, no-build, no-backend wedding invitation. Three files, deployed
+straight to GitHub Pages.
 
 ```
-wedding-site/
-├── index.html          # Main HTML file
-├── css/
-│   └── styles.css      # All styles
-├── js/
-│   └── main.js         # All JavaScript
-├── photos/
-│   ├── photo1.jpg      # Your wedding photos go here
-│   ├── photo2.jpg
-│   ├── photo3.jpg
-│   ├── photo4.jpg
-│   ├── photo5.jpg
-│   └── photo6.jpg
-├── README.md           # This file
-├── PHOTO-GUIDE.md      # Quick photo replacement guide
-└── .gitignore          # Files to ignore in git
+index.html          the page
+css/styles.css      all styles
+js/main.js          all behaviour — the SITE config at the top is what you edit
+photos/             drop your photographs here
 ```
-
-## 🚀 Deploy to GitHub Pages
-
-### 1. Create a GitHub Repository
-
-```bash
-# On your computer, navigate to this folder
-cd wedding-site
-
-# Initialize git
-git init
-
-# Add all files
-git add .
-
-# Commit
-git commit -m "Initial wedding site"
-
-# Create a new repository on GitHub (github.com/new)
-# Name it whatever you want, e.g., "rajat-ishika-wedding"
-
-# Connect to your GitHub repo (replace USERNAME and REPO)
-git remote add origin https://github.com/USERNAME/REPO.git
-
-# Push
-git branch -M main
-git push -u origin main
-```
-
-### 2. Enable GitHub Pages
-
-1. Go to your repository on GitHub
-2. Click **Settings** (top right)
-3. Scroll down to **Pages** (left sidebar)
-4. Under "Source", select **Branch: main**
-5. Leave the folder as **/ (root)**
-6. Click **Save**
-
-Your site will be live at: `https://USERNAME.github.io/REPO/`
-
-Usually takes 1-2 minutes to deploy.
-
-## 📸 Adding Your Photos
-
-### How to Add Photos
-
-1. **Place your photos** in the `photos/` folder
-2. Name them `photo1.jpg`, `photo2.jpg`, etc. (or any name you prefer)
-3. **Edit `index.html`** — find the gallery section (search for `id="GG"`)
-
-For each `.gi` div, replace the placeholder `<div class="gph">...</div>` with:
-
-```html
-<!-- BEFORE (placeholder) -->
-<div class="gph"><div class="gph-n">i</div><div class="gph-l">Together</div></div>
-
-<!-- AFTER (with your photo) -->
-<img src="photos/photo1.jpg" alt="Rajat & Ishika">
-```
-
-**Complete example** for the first tile:
-
-```html
-<div class="gi">
-  <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-  <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-  <div class="gi-badge">— No. 01 —</div>
-  <div class="gi-expand">↗</div>
-  <!-- Replace this placeholder: -->
-  <img src="photos/photo1.jpg" alt="Rajat & Ishika - Where it all began">
-  <!-- Keep these: -->
-  <div class="gi-grad"></div><div class="gi-tint"></div>
-  <div class="gi-caption">
-    <div class="gi-caption-title">Where it all began</div>
-    <div class="gi-caption-meta">Chapter 01 · The First Glance</div>
-  </div>
-</div>
-```
-
-Repeat for all 6 tiles.
-
-### Recommended Photo Specs
-
-- **Format:** JPG or PNG
-- **Size:** 1200-2000px wide (will auto-resize for web)
-- **File size:** Keep under 500KB each for fast loading (use TinyPNG.com to compress)
-
-### Push Updates
-
-After adding photos:
-
-```bash
-git add .
-git commit -m "Add wedding photos"
-git push
-```
-
-Changes go live in ~1 minute.
-
-## ✨ Features
-
-- **Fluid gradient background** that shifts colors as you scroll through sections
-- **Shooting stars** that occasionally streak across the screen
-- **Marigold petal burst** — click anywhere to shower petals
-- **"Bless the Couple"** button triggers a full-screen blessing with epic petal shower
-- **Ampersand easter egg** — click or double-click the `&` for petal bursts
-- **Photo gallery** with:
-  - Scroll parallax inside each image
-  - 3D tilt on hover
-  - Gold corner ornaments
-  - Cinematic captions
-  - Full-screen lightbox with chapter info
-- **Scrollytelling** — each ceremony gets its own full-screen moment
-- **Live countdown** to the wedding date
-- **Magnetic buttons** that attract to your cursor
-
-## 🎨 Customization
-
-### Change Colors
-
-Edit the fluid gradient blob colors around line 525 in the `MOODS` array.
-
-### Change Captions
-
-Update the `.gi-caption-title` and `.gi-caption-meta` text for each photo tile.
-
-### Add More Photos
-
-Duplicate a `.gi` div block and increment the badge number.
-
-## 📱 Mobile Optimized
-
-The site is fully responsive and works beautifully on phones and tablets.
 
 ---
 
-**Questions?** Just ask!
+## 1. Ceremony times and venue
+
+Open `js/main.js`. The first ~30 lines are a `SITE` object holding the couple,
+the venue string, the three ceremony times, and the countdown target. Those
+values feed the hero countdown and the `.ics` calendar files.
+
+### Changing times
+
+Times in `SITE.events` are ISO strings with the `+05:30` India offset on the
+end. Keep the offset; it's what makes "Add to calendar" land at the right hour
+for a guest flying in from another timezone.
+
+```js
+haldi: { name:'Haldi', start:'2026-11-20T11:00:00+05:30', end:'2026-11-20T15:00:00+05:30', ... }
+```
+
+`countdownTo` drives the hero counter — it points at the Haldi by default.
+
+Ceremony **prose** (the descriptions, dress-code colour chips, the displayed
+times) is in `index.html` under `<section id="events">`. If you change a time in
+`SITE`, change the matching `.story-meta` line too — they are deliberately
+separate so the copy can read like a human wrote it.
+
+---
+
+## 2. Adding your photographs
+
+See **PHOTO-GUIDE.md**. The short version: drop `photo1.jpg` … `photo6.jpg` into
+`photos/` and swap each `<div class="gph">…</div>` for an `<img>`. The gallery,
+lightbox and captions all keep working; tiles with no photo yet show a
+letterpress placeholder rather than a broken image.
+
+For the WhatsApp link preview, add `photos/og-preview.jpg` at **1200 × 630**.
+
+---
+
+## 3. Deploy
+
+See **DEPLOY.md**, or if the repo is already set up:
+
+```bash
+git add .
+git commit -m "Update the wedding site"
+git push
+```
+
+Live in about a minute.
+
+---
+
+## What's on the page
+
+| Section | What it does |
+|---|---|
+| **Hero** | Names revealed letter by letter, a marigold *toran* strung across the top, a rotating rangoli, and a **live countdown** to the Haldi |
+| **Invitation** | A sealed card that opens when you tap it (and on its own if you scroll past) |
+| **Ceremonies** | Haldi, Sagan and Shaadi, one full screen each, with dress-code colours and a per-ceremony **Add to calendar** |
+| **Venue & Travel** | The venue, a Google Maps link, and how to arrive by air, rail and road |
+| **Gallery** | Editorial grid → full-screen lightbox with keyboard arrows and swipe |
+
+### Things that are easy to miss
+
+- **A gold thread** draws itself down the left edge as you scroll, knotting at
+  each section — the *gathbandhan* that ties the whole page together.
+- **The background changes temperature** per ceremony: turmeric for Haldi,
+  crimson for Sagan, gold for Shaadi.
+- **`Cmd/Ctrl + P`** prints a clean paper invitation — the ambient layers,
+  gallery and buttons all drop away.
+- **Reduced motion** is fully respected: every animation stops, nothing is
+  hidden, and the curtain intro is skipped entirely.
+
+---
+
+## Notes
+
+- No build step, no dependencies, no framework. Open `index.html` and it works.
+- Two Google Fonts (Instrument Serif, Inter) plus Tiro Devanagari Hindi for the
+  Hindi lines. Everything else is hand-drawn SVG generated in JS — the rangoli,
+  the garland, the wax seal, the knot in the footer.

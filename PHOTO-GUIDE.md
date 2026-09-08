@@ -1,69 +1,99 @@
-# Quick Photo Replacement Guide
+# Adding your photographs
 
-## File Structure
+The gallery ships with six letterpress placeholders. Replacing one is a
+one-line edit.
 
-Your site is organized production-style:
-- `index.html` — main HTML
-- `css/styles.css` — all styles
-- `js/main.js` — all JavaScript
-- `photos/` — your wedding photos go here
+## 1. Put the files in `photos/`
 
-## Step 1: Open index.html in a text editor
+Name them however you like; `photo1.jpg` … `photo6.jpg` keeps things simple.
 
-## Step 2: Find the gallery section (around line 490)
+**Specs**
+- JPG or WebP
+- 1600–2400 px on the long edge (the lightbox shows them full screen)
+- Under ~400 KB each — run them through [Squoosh](https://squoosh.app) or
+  TinyPNG first, otherwise the page crawls on hotel wifi
 
-Look for: `<div class="gg rv d1" id="GG">`
+## 2. Swap the placeholder for an `<img>`
 
-## Step 3: For EACH photo tile, replace this:
+Open `index.html` and find `<div class="gg rv d1" id="GG">`. Each photograph is
+one `<figure class="gi">` block. Inside it, find this single line:
 
-### BEFORE (placeholder):
 ```html
-<div class="gi">
-  <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-  <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-  <div class="gi-badge">— No. 01 —</div>
-  <div class="gi-expand">↗</div>
-  <div class="gph"><div class="gph-n">i</div><div class="gph-l">Together</div></div>
-  <div class="gi-grad"></div><div class="gi-tint"></div>
-  <div class="gi-caption">
-    <div class="gi-caption-title">Where it all began</div>
-    <div class="gi-caption-meta">Chapter 01 · The First Glance</div>
-  </div>
-</div>
+<div class="gph"><span class="gph-n">i</span><span class="gph-l">Together</span></div>
 ```
 
-### AFTER (with your photo):
+Replace **just that line** with:
+
 ```html
-<div class="gi">
-  <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-  <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-  <div class="gi-badge">— No. 01 —</div>
-  <div class="gi-expand">↗</div>
-  <!-- CHANGED: Replace the .gph div with img tag -->
-  <img src="photos/photo1.jpg" alt="Rajat & Ishika">
-  <!-- Keep everything else the same -->
-  <div class="gi-grad"></div><div class="gi-tint"></div>
-  <div class="gi-caption">
-    <div class="gi-caption-title">Where it all began</div>
-    <div class="gi-caption-meta">Chapter 01 · The First Glance</div>
-  </div>
-</div>
+<img src="photos/photo1.jpg" alt="Rajat and Ishika at the lake in Nainital">
 ```
 
-**What changed:** Only the `<div class="gph">...</div>` becomes `<img src="photos/photoN.jpg" alt="...">`
+That's the whole edit. Leave the corners, badge, expand icon, gradient, tint and
+caption exactly as they are — they're what makes the frame look like a frame.
 
-Everything else (corners, badge, expand icon, gradient, tint, caption) stays exactly the same.
+The finished tile:
 
-## Repeat for all 6 tiles
+```html
+<figure class="gi" data-span="wide">
+  <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
+  <div class="gi-corner bl"></div><div class="gi-corner br"></div>
+  <div class="gi-badge">— No. 01 —</div><div class="gi-expand" aria-hidden="true">↗</div>
 
-- Tile 1: `photos/photo1.jpg`
-- Tile 2: `photos/photo2.jpg`
-- Tile 3: `photos/photo3.jpg`
-- Tile 4: `photos/photo4.jpg`
-- Tile 5: `photos/photo5.jpg`
-- Tile 6: `photos/photo6.jpg`
+  <img src="photos/photo1.jpg" alt="Rajat and Ishika at the lake in Nainital">
 
-## Save, commit, and push
+  <div class="gi-grad"></div><div class="gi-tint"></div>
+  <figcaption class="gi-caption">
+    <div class="gi-caption-title">Where it all began</div>
+    <div class="gi-caption-meta">Chapter 01 · The first glance</div>
+  </figcaption>
+</figure>
+```
+
+Repeat for tiles 2–6. You can do them one at a time — tiles you haven't
+got to yet keep showing their placeholder instead of a broken image.
+
+### Write real `alt` text
+
+One short sentence describing what's actually in the frame. It's what a guest
+using a screen reader hears, and what shows if the photo fails to load.
+"Rajat and Ishika" on all six is a wasted opportunity.
+
+## 3. Captions
+
+Two lines per tile, both in the `<figcaption>`, both shown in the lightbox:
+
+```html
+<div class="gi-caption-title">Where it all began</div>
+<div class="gi-caption-meta">Chapter 01 · The first glance</div>
+```
+
+## Changing the layout
+
+Tile shape is set by one attribute:
+
+| Attribute | Shape | Width on desktop |
+|---|---|---|
+| *(none)* | portrait 3:4 | ⅓ of the row |
+| `data-span="wide"` | landscape 16:10 | ½ of the row |
+| `data-span="tall"` | portrait 2:3 | ⅓ of the row |
+
+The grid is six columns, so a `wide` tile plus a normal one fills a row neatly.
+Match the attribute to the photo's real orientation — a portrait shot in a
+`wide` slot gets cropped hard.
+
+## Adding a seventh photo
+
+Copy any `<figure class="gi">` block, paste it in, bump the `— No. 07 —` badge
+and change the `src`. The "06 moments" counter in the header updates itself, and
+the lightbox picks the new one up automatically.
+
+## The WhatsApp link preview
+
+When someone forwards the site, WhatsApp shows the image at
+`photos/og-preview.jpg`. Add one at **1200 × 630** — a landscape couple photo
+with room at the edges, since WhatsApp crops it.
+
+## Ship it
 
 ```bash
 git add .
@@ -71,4 +101,5 @@ git commit -m "Add wedding photos"
 git push
 ```
 
-Your site updates in ~1 minute!
+Live in about a minute. Hard-refresh (`Cmd/Ctrl + Shift + R`) if you still see
+the old ones.

@@ -3,49 +3,381 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rajat & Ishika — 20·21 Nov 2026</title>
+<meta name="theme-color" content="#FBF4E6">
+<title>Rajat &amp; Ishika — 20·21 November 2026</title>
+<meta name="description" content="Rajat & Ishika are getting married. Haldi, Sagan and Shaadi — 20 to 21 November 2026 at Uday Residency, Rudrapur. Ceremonies, travel and gallery.">
 
 <!-- Open Graph / WhatsApp preview -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rajatwedsishika.life/">
-<meta property="og:title" content="Rajat & Ishika — We're getting married! 💍">
-<meta property="og:description" content="Join us to celebrate our wedding on 20–21 November 2025 at Uday Residency, Rudrapur.">
+<meta property="og:title" content="Rajat &amp; Ishika — We're getting married! 💍">
+<meta property="og:description" content="Join us to celebrate our wedding on 20–21 November 2026 at Uday Residency, Rudrapur.">
 <meta property="og:image" content="https://rajatwedsishika.life/photos/og-preview.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<canvas id="fluid"></canvas>
-<div id="grain"></div>
+<a class="skip-link" href="#hero">Skip to content</a>
 
-<!-- BLESSING OVERLAY -->
-<div id="bless-overlay" role="dialog" aria-modal="true">
-  <div class="bless-stage">
-    <span class="bless-flourish">✦</span>
-    <div class="bless-eyebrow">A Blessing</div>
-    <h2 class="bless-title">May your love be forever.</h2>
-    <p class="bless-body">
-      May every sunrise find you holding hands.<br>
-      May every storm pass quickly. May joy be a <em>frequent guest</em><br>
-      in the home you build together.
-    </p>
-    <div class="bless-signature">— from all of us</div>
-    <button class="bless-close" id="blessClose">Close</button>
+<!-- ══════════ CURTAIN / PRELOADER ══════════ -->
+<div id="curtain" aria-hidden="true">
+  <div class="curtain-half left"></div>
+  <div class="curtain-half right"></div>
+  <div class="curtain-core">
+    <svg class="curtain-mandala" viewBox="0 0 200 200" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
+        <circle class="cm-p" cx="100" cy="100" r="26"/>
+        <circle class="cm-p" cx="100" cy="100" r="46"/>
+        <circle class="cm-p" cx="100" cy="100" r="66"/>
+        <circle class="cm-p" cx="100" cy="100" r="86"/>
+        <g class="cm-rays"></g>
+      </g>
+    </svg>
+    <div class="curtain-word">शुभ विवाह</div>
   </div>
 </div>
 
-<div id="PB"></div>
+<!-- ══════════ AMBIENT LAYERS ══════════ -->
+<canvas id="fluid" aria-hidden="true"></canvas>
+<div id="grain" aria-hidden="true"></div>
+<div id="PB" aria-hidden="true"></div>
 
-<div id="LB" role="dialog" aria-modal="true">
-  <button class="lbb" id="LBx">×</button>
-  <button class="lbb" id="LBp">←</button>
+<!-- the gathbandhan thread that draws down the page -->
+<svg id="thread" viewBox="0 0 60 1000" preserveAspectRatio="none" aria-hidden="true">
+  <path id="thread-track" d="M30 0 C 8 140, 52 260, 30 400 S 8 620, 30 760 S 52 900, 30 1000" />
+  <path id="thread-draw"  d="M30 0 C 8 140, 52 260, 30 400 S 8 620, 30 760 S 52 900, 30 1000" />
+</svg>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="NAV">
+  <a class="nlogo" href="#hero" aria-label="Rajat and Ishika — home">
+    <span>R</span><em>&amp;</em><span>I</span>
+  </a>
+  <ul class="nlinks">
+    <li><a href="#invite">Invitation</a></li>
+    <li><a href="#events">Ceremonies</a></li>
+    <li><a href="#venue">Venue &amp; Travel</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+  </ul>
+  <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="NAV" aria-label="Menu">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<section id="hero" data-mood="0" data-thread="Save the date">
+  <!-- marigold toran strung across the top -->
+  <div class="toran" aria-hidden="true"><svg id="toranSvg" viewBox="0 0 1200 120" preserveAspectRatio="none"></svg></div>
+
+  <svg class="hero-mandala" viewBox="0 0 600 600" aria-hidden="true"><g id="mandalaG"></g></svg>
+
+  <div class="hero-stage">
+    <div class="h-tag">
+      <span class="h-tag-deva">शुभ विवाह</span>
+      <span class="h-tag-en">A wedding celebration · 2026</span>
+    </div>
+
+    <div class="h-name-wrap">
+      <h1 class="sr-only">Rajat and Ishika are getting married</h1>
+      <div class="h-name" data-text="Rajat" aria-hidden="true"></div>
+      <div class="h-amp" role="img" aria-label="and">&amp;</div>
+      <div class="h-name" data-text="Ishika" data-delay="1.15" aria-hidden="true"></div>
+    </div>
+
+    <p class="h-date">November <b>20 &mdash; 21</b> <i>·</i> Uday Residency <i>·</i> Rudrapur</p>
+
+    <!-- live countdown -->
+    <div class="countdown" id="countdown" aria-live="off">
+      <div class="cd-unit"><span class="cd-num" data-cd="days">—</span><span class="cd-lab">days</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><span class="cd-num" data-cd="hours">—</span><span class="cd-lab">hours</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><span class="cd-num" data-cd="mins">—</span><span class="cd-lab">minutes</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><span class="cd-num" data-cd="secs">—</span><span class="cd-lab">seconds</span></div>
+    </div>
+    <p class="cd-note" id="cdNote">until the first tilak of turmeric</p>
+
+    <div class="h-cta-row">
+      <a href="#events" class="h-cta primary">The ceremonies <span class="h-cta-arrow">→</span></a>
+      <button class="h-cta ghost" data-ics="all">Add to calendar <span class="h-cta-arrow">↓</span></button>
+      <a href="#venue" class="h-cta ghost">Getting there</a>
+    </div>
+  </div>
+
+  <div class="h-floor-l">20.11.2026</div>
+  <div class="h-floor-r">21.11.2026</div>
+
+  <a class="h-scroll" href="#invite" aria-label="Scroll to the invitation">
+    <span class="h-scroll-icon">↓</span><span>Scroll</span>
+  </a>
+</section>
+
+<!-- ══════════ INVITATION ══════════ -->
+<section id="invite" data-mood="0" data-thread="The invitation">
+  <div class="invite-wrap">
+    <div class="invite-card rv" id="inviteCard">
+      <div class="ic-flap" aria-hidden="true">
+        <div class="ic-seal">
+          <svg viewBox="0 0 60 60" aria-hidden="true"><g id="sealG"></g></svg>
+          <span>R&amp;I</span>
+        </div>
+        <div class="ic-flap-hint">Tap to open the invitation</div>
+      </div>
+
+      <div class="ic-inner">
+        <div class="ic-corner tl"></div><div class="ic-corner tr"></div>
+        <div class="ic-corner bl"></div><div class="ic-corner br"></div>
+
+        <div class="ic-om">॥ श्री गणेशाय नमः ॥</div>
+        <div class="ic-eyebrow">With the blessings of our families</div>
+
+        <p class="ic-lede">
+          We are getting married &mdash; and a wedding is only as bright as
+          the people in the room. Come eat too much, dance badly,
+          and see us begin.
+        </p>
+
+        <div class="ic-names">
+          <span>Rajat</span>
+          <em>weds</em>
+          <span>Ishika</span>
+        </div>
+
+        <div class="ic-rule" aria-hidden="true"><i></i><b>✦</b><i></i></div>
+
+        <div class="ic-facts">
+          <div><div class="icf-l">When</div><div class="icf-v">Friday 20 &amp;<br>Saturday 21 November 2026</div></div>
+          <div><div class="icf-l">Where</div><div class="icf-v">Uday Residency<br>Rudrapur, Uttarakhand</div></div>
+          <div><div class="icf-l">Dress</div><div class="icf-v">Indian festive<br>&amp; bring dancing shoes</div></div>
+        </div>
+
+        <!-- Add family names here when you're ready, e.g.
+             <div class="ic-hosts">Son of Mr &amp; Mrs ____ · Daughter of Mr &amp; Mrs ____</div> -->
+
+        <div class="ic-sign">— Rajat &amp; Ishika</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CEREMONIES (scrollytelling) ══════════ -->
+<section id="events">
+  <div class="events-rail" aria-hidden="true">
+    <span class="er-lab">The order of things</span>
+  </div>
+
+  <article class="story-section" data-mood="0" data-thread="Haldi" data-event="haldi">
+    <div class="story-content">
+      <div class="story-eyebrow rv"><span class="day">Day 01</span> · The beginning</div>
+      <div class="story-bignum rv d1" data-num="20">20</div>
+      <h2 class="story-name rv d2">Haldi <span class="story-deva">हल्दी</span></h2>
+      <div class="story-meta rv d3">
+        <span>Fri 20 Nov</span><i class="dot"></i><span>11:00 am onwards</span><i class="dot"></i><span>Lunch served</span>
+      </div>
+      <p class="story-desc rv d4">Turmeric on skin, water fights nobody planned, and a whole family conspiring to stain your best clothes. Wear something you have already forgiven.</p>
+      <div class="story-dress rv d5">
+        <span class="sd-lab">Dress code</span>
+        <span class="chip" style="--c:#F5C542">Marigold</span>
+        <span class="chip" style="--c:#F2790C">Saffron</span>
+        <span class="chip" style="--c:#FFF3C4">Ivory</span>
+      </div>
+      <button class="story-ics rv d5" data-ics="haldi">Add Haldi to calendar ↓</button>
+    </div>
+  </article>
+
+  <article class="story-section" data-mood="1" data-thread="Sagan" data-event="sagan">
+    <div class="story-content">
+      <div class="story-eyebrow rv"><span class="day">Day 01</span> · The evening</div>
+      <div class="story-bignum rv d1" data-num="20">20</div>
+      <h2 class="story-name rv d2">Sagan <span class="story-deva">सगन</span></h2>
+      <div class="story-meta rv d3">
+        <span>Fri 20 Nov</span><i class="dot"></i><span>7:00 pm onwards</span><i class="dot"></i><span>Dinner served</span>
+      </div>
+      <p class="story-desc rv d4">The lamps come on and two families formally decide to put up with each other forever. Sweets are exchanged, blessings given, and the dancing starts earlier than anyone admits.</p>
+      <div class="story-dress rv d5">
+        <span class="sd-lab">Dress code</span>
+        <span class="chip" style="--c:#C0143C">Crimson</span>
+        <span class="chip" style="--c:#E0197F">Rani pink</span>
+        <span class="chip" style="--c:#7A1030">Deep rose</span>
+      </div>
+      <button class="story-ics rv d5" data-ics="sagan">Add Sagan to calendar ↓</button>
+    </div>
+  </article>
+
+  <article class="story-section" data-mood="2" data-thread="Shaadi" data-event="shaadi">
+    <div class="story-content">
+      <div class="story-eyebrow rv"><span class="day">Day 02</span> · The vows</div>
+      <div class="story-bignum rv d1" data-num="21">21</div>
+      <h2 class="story-name rv d2">Shaadi <span class="story-deva">शादी</span></h2>
+      <div class="story-meta rv d3">
+        <span>Sat 21 Nov</span><i class="dot"></i><span>12:00 noon onwards</span><i class="dot"></i><span>Lunch served</span>
+      </div>
+      <p class="story-desc rv d4">Seven steps, one fire, and every person we love in one place. This is the one we will be asking you about for the next forty years, so please be in the photographs.</p>
+      <div class="story-dress rv d5">
+        <span class="sd-lab">Dress code</span>
+        <span class="chip" style="--c:#C9A227">Gold</span>
+        <span class="chip" style="--c:#C0143C">Red</span>
+        <span class="chip" style="--c:#F2790C">Marigold</span>
+      </div>
+      <button class="story-ics rv d5" data-ics="shaadi">Add Shaadi to calendar ↓</button>
+    </div>
+  </article>
+</section>
+
+<!-- ══════════ VENUE & TRAVEL ══════════ -->
+<section id="venue" data-mood="2" data-thread="Getting there">
+  <div class="venue-card rv">
+    <div class="venue-eyebrow">The venue</div>
+    <div class="venue-name">Uday <em>Residency</em></div>
+    <div class="venue-loc">Rudrapur · Udham Singh Nagar · Uttarakhand</div>
+    <div class="venue-divider" aria-hidden="true"></div>
+    <div class="venue-meta">
+      <div><div class="vm-label">From</div><div class="vm-val">20 Nov</div></div>
+      <div><div class="vm-label">To</div><div class="vm-val">21 Nov</div></div>
+      <div><div class="vm-label">Year</div><div class="vm-val">2026</div></div>
+    </div>
+    <a class="venue-map" href="https://www.google.com/maps/search/?api=1&query=Uday+Residency+Rudrapur+Uttarakhand" target="_blank" rel="noopener">
+      Open in Google Maps <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+
+  <div class="travel rv d1">
+    <div class="travel-head">
+      <div class="t-title">How to <em>reach us</em></div>
+      <p class="t-sub">Rudrapur sits at the foot of the Kumaon hills, about 250 km from Delhi. Whichever way you come, tell us your arrival time and we will send someone.</p>
+    </div>
+    <div class="travel-grid">
+      <div class="tcard">
+        <div class="tc-icon" aria-hidden="true">✈</div>
+        <div class="tc-mode">By air</div>
+        <div class="tc-main">Pantnagar Airport <span>(PGH)</span></div>
+        <p class="tc-note">The closest airport — roughly a 30-minute drive to the venue. Flights run via Delhi and Dehradun. Delhi (DEL) is the reliable fallback, then train or car.</p>
+      </div>
+      <div class="tcard">
+        <div class="tc-icon" aria-hidden="true">⏚</div>
+        <div class="tc-mode">By rail</div>
+        <div class="tc-main">Rudrapur City <span>(RUPC)</span></div>
+        <p class="tc-note">Lalkuan and Kathgodam are the bigger junctions nearby if you cannot find a seat. Overnight trains from Delhi and Lucknow get you in by morning.</p>
+      </div>
+      <div class="tcard">
+        <div class="tc-icon" aria-hidden="true">⌒</div>
+        <div class="tc-mode">By road</div>
+        <div class="tc-main">≈ 5–6 hrs from Delhi</div>
+        <p class="tc-note">NH-9 via Moradabad and Rampur, then on to Rudrapur. An easy drive, and the best one if you are coming as a group.</p>
+      </div>
+    </div>
+    <div class="travel-foot">
+      <span>Need a room, a pickup, or a plus-one sorted? Just call — we would rather over-plan than have you stranded.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GALLERY ══════════ -->
+<section id="gallery" data-mood="2" data-thread="In frames">
+  <div class="g-header rv">
+    <div class="g-title">Our story<br>in <em>frames</em></div>
+    <div class="g-meta"><span id="gCount">06</span> moments</div>
+  </div>
+
+  <div class="gg rv d1" id="GG">
+    <!-- Swap each .gph placeholder for: <img src="photos/photo1.jpg" alt="..."> — see PHOTO-GUIDE.md -->
+    <figure class="gi" data-span="wide">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div><div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 01 —</div><div class="gi-expand" aria-hidden="true">↗</div>
+      <div class="gph"><span class="gph-n">i</span><span class="gph-l">Together</span></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <figcaption class="gi-caption">
+        <div class="gi-caption-title">Where it all began</div>
+        <div class="gi-caption-meta">Chapter 01 · The first glance</div>
+      </figcaption>
+    </figure>
+
+    <figure class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div><div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 02 —</div><div class="gi-expand" aria-hidden="true">↗</div>
+      <div class="gph"><span class="gph-n">ii</span><span class="gph-l">Promise</span></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <figcaption class="gi-caption">
+        <div class="gi-caption-title">A quiet promise</div>
+        <div class="gi-caption-meta">Chapter 02 · Just us</div>
+      </figcaption>
+    </figure>
+
+    <figure class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div><div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 03 —</div><div class="gi-expand" aria-hidden="true">↗</div>
+      <div class="gph"><span class="gph-n">iii</span><span class="gph-l">Laughter</span></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <figcaption class="gi-caption">
+        <div class="gi-caption-title">Endless laughter</div>
+        <div class="gi-caption-meta">Chapter 03 · Joy</div>
+      </figcaption>
+    </figure>
+
+    <figure class="gi" data-span="tall">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div><div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 04 —</div><div class="gi-expand" aria-hidden="true">↗</div>
+      <div class="gph"><span class="gph-n">iv</span><span class="gph-l">Adventures</span></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <figcaption class="gi-caption">
+        <div class="gi-caption-title">The adventures</div>
+        <div class="gi-caption-meta">Chapter 04 · Wanderlust</div>
+      </figcaption>
+    </figure>
+
+    <figure class="gi">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div><div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 05 —</div><div class="gi-expand" aria-hidden="true">↗</div>
+      <div class="gph"><span class="gph-n">v</span><span class="gph-l">Home</span></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <figcaption class="gi-caption">
+        <div class="gi-caption-title">Building a home</div>
+        <div class="gi-caption-meta">Chapter 05 · Us</div>
+      </figcaption>
+    </figure>
+
+    <figure class="gi" data-span="wide">
+      <div class="gi-corner tl"></div><div class="gi-corner tr"></div><div class="gi-corner bl"></div><div class="gi-corner br"></div>
+      <div class="gi-badge">— No. 06 —</div><div class="gi-expand" aria-hidden="true">↗</div>
+      <div class="gph"><span class="gph-n">vi</span><span class="gph-l">Forever</span></div>
+      <div class="gi-grad"></div><div class="gi-tint"></div>
+      <figcaption class="gi-caption">
+        <div class="gi-caption-title">And finally — forever</div>
+        <div class="gi-caption-meta">Chapter 06 · The vow</div>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <svg class="knot" viewBox="0 0 200 90" aria-hidden="true">
+    <path id="knotPath" d="M20 45 C 60 5, 80 5, 100 45 C 120 85, 140 85, 180 45 C 140 5, 120 5, 100 45 C 80 85, 60 85, 20 45" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  </svg>
+  <div class="fb">Rajat <em>&amp;</em> Ishika</div>
+  <div class="fm">20 — 21 November 2026<br>Uday Residency · Rudrapur, Uttarakhand</div>
+  <div class="fx">
+    <button data-ics="all" class="link-btn">Add to calendar</button><i>·</i>
+    <button id="shareBtn" class="link-btn">Share the invite</button>
+  </div>
+  <div class="fc">Made with a great deal of love, and slightly too much CSS.</div>
+</footer>
+
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div id="LB" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="lbb" id="LBx" aria-label="Close">×</button>
+  <button class="lbb" id="LBp" aria-label="Previous photo">←</button>
   <img id="LBi" src="" alt="">
-  <button class="lbb" id="LBn">→</button>
+  <div id="LBph" aria-hidden="true"></div>
+  <button class="lbb" id="LBn" aria-label="Next photo">→</button>
   <div id="LB-info">
     <div id="LB-info-title"></div>
     <div id="LB-info-meta"></div>
@@ -53,211 +385,8 @@
   <div id="LBc"></div>
 </div>
 
-<nav id="NAV">
-  <div class="nlogo">R & I</div>
-  <ul class="nlinks">
-    <li><a href="#story">Events</a></li>
-    <li><a href="#venue">Venue</a></li>
-    <li><a href="#gallery">Gallery</a></li>
-  </ul>
-</nav>
-
-<!-- ══ HERO ══ -->
-<section id="hero">
-  <div class="h-tag">A Wedding Celebration · 2026</div>
-
-  <div class="hero-stage">
-    <div class="h-name-wrap">
-      <div class="h-name" data-text="Rajat"></div>
-      <div class="h-amp">&amp;</div>
-      <div class="h-name" data-text="Ishika" data-delay="1.3"></div>
-    </div>
-
-    <div class="h-date">November <b>20 — 21</b> · Uday Residency · Rudrapur</div>
-
-    <div class="h-cta-row">
-      <a href="#story" class="h-cta">See the events <span class="h-cta-arrow">→</span></a>
-      <a href="#gallery" class="h-cta ghost">View gallery</a>
-      <button class="h-cta bless" id="blessBtn">Bless the couple <span class="h-cta-arrow">✦</span></button>
-    </div>
-  </div>
-
-  <div class="h-floor-l">20.11.25</div>
-  <div class="h-floor-r">21.11.25</div>
-
-  <div class="h-scroll" onclick="document.getElementById('story').scrollIntoView({behavior:'smooth'})">
-    <div class="h-scroll-icon">↓</div>
-    <span>Scroll</span>
-  </div>
-</section>
-
-<!-- ══ STORY (sticky scrollytelling) ══ -->
-<section id="story">
-
-  <div class="story-section" data-blob-mood="0">
-    <div class="story-content">
-      <div class="story-eyebrow rv"><span class="day">Day 01</span> · The Beginning</div>
-      <div class="story-bignum rv d1">20</div>
-      <div class="story-name rv d2">Haldi</div>
-      <div class="story-meta rv d3">
-        <span>20 Nov 2026</span><span class="story-meta-dot"></span>
-        <span>Lunch</span><span class="story-meta-dot"></span>
-        <span>Afternoon</span>
-      </div>
-      <p class="story-desc rv d4">The morning of celebration. Turmeric, laughter, and the start of something forever.</p>
-    </div>
-  </div>
-
-  <div class="story-section" data-blob-mood="1">
-    <div class="story-content">
-      <div class="story-eyebrow rv"><span class="day">Day 01</span> · The Evening</div>
-      <div class="story-bignum rv d1">20</div>
-      <div class="story-name rv d2">Sagan</div>
-      <div class="story-meta rv d3">
-        <span>20 Nov 2026</span><span class="story-meta-dot"></span>
-        <span>Dinner</span><span class="story-meta-dot"></span>
-        <span>Evening</span>
-      </div>
-      <p class="story-desc rv d4">As the sun sets, two families come together. Sweets are exchanged, blessings shared.</p>
-    </div>
-  </div>
-
-  <div class="story-section" data-blob-mood="2">
-    <div class="story-content">
-      <div class="story-eyebrow rv"><span class="day">Day 02</span> · The Vows</div>
-      <div class="story-bignum rv d1">21</div>
-      <div class="story-name rv d2">Shaadi</div>
-      <div class="story-meta rv d3">
-        <span>21 Nov 2026</span><span class="story-meta-dot"></span>
-        <span>Lunch</span><span class="story-meta-dot"></span>
-        <span>The Wedding</span>
-      </div>
-      <p class="story-desc rv d4">The day everything changes. Two become one, surrounded by the people they love most.</p>
-    </div>
-  </div>
-
-</section>
-
-<!-- ══ VENUE ══ -->
-<section id="venue">
-  <div class="venue-card rv">
-    <div class="venue-eyebrow">The Venue</div>
-    <div class="venue-name">Uday <em>Residency</em></div>
-    <div class="venue-loc">Rudrapur · Uttarakhand</div>
-    <div class="venue-divider"></div>
-    <div class="venue-meta">
-      <div><div class="vm-label">From</div><div class="vm-val">20 November</div></div>
-      <div><div class="vm-label">To</div><div class="vm-val">21 November</div></div>
-      <div><div class="vm-label">Year</div><div class="vm-val">2026</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ GALLERY ══ -->
-<section id="gallery">
-  <div class="g-header rv">
-    <div class="g-title">Our story<br>in <em>frames</em></div>
-    <div class="g-meta">06 moments</div>
-  </div>
-  <div class="gg rv d1" id="GG">
-    
-    <!-- Photo 1: Main couple photo (wide cinematic) -->
-    <div class="gi">
-      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-      <div class="gi-badge">— No. 01 —</div>
-      <div class="gi-expand">↗</div>
-      <!-- Replace this placeholder with: <img src="photos/photo1.jpg" alt="Rajat & Ishika"> -->
-      <div class="gph"><div class="gph-n">i</div><div class="gph-l">Together</div></div>
-      <div class="gi-grad"></div><div class="gi-tint"></div>
-      <div class="gi-caption">
-        <div class="gi-caption-title">Where it all began</div>
-        <div class="gi-caption-meta">Chapter 01 · The First Glance</div>
-      </div>
-    </div>
-
-    <!-- Photo 2 -->
-    <div class="gi">
-      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-      <div class="gi-badge">— No. 02 —</div>
-      <div class="gi-expand">↗</div>
-      <!-- Replace with: <img src="photos/photo2.jpg" alt="Rajat & Ishika"> -->
-      <div class="gph"><div class="gph-n">ii</div><div class="gph-l">Promise</div></div>
-      <div class="gi-grad"></div><div class="gi-tint"></div>
-      <div class="gi-caption">
-        <div class="gi-caption-title">A quiet promise</div>
-        <div class="gi-caption-meta">Chapter 02 · Just Us</div>
-      </div>
-    </div>
-
-    <!-- Photo 3 -->
-    <div class="gi">
-      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-      <div class="gi-badge">— No. 03 —</div>
-      <div class="gi-expand">↗</div>
-      <!-- Replace with: <img src="photos/photo3.jpg" alt="Rajat & Ishika"> -->
-      <div class="gph"><div class="gph-n">iii</div><div class="gph-l">Laughter</div></div>
-      <div class="gi-grad"></div><div class="gi-tint"></div>
-      <div class="gi-caption">
-        <div class="gi-caption-title">Endless laughter</div>
-        <div class="gi-caption-meta">Chapter 03 · Joy</div>
-      </div>
-    </div>
-
-    <!-- Photo 4 -->
-    <div class="gi">
-      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-      <div class="gi-badge">— No. 04 —</div>
-      <div class="gi-expand">↗</div>
-      <!-- Replace with: <img src="photos/photo4.jpg" alt="Rajat & Ishika"> -->
-      <div class="gph"><div class="gph-n">iv</div><div class="gph-l">Adventures</div></div>
-      <div class="gi-grad"></div><div class="gi-tint"></div>
-      <div class="gi-caption">
-        <div class="gi-caption-title">The adventures</div>
-        <div class="gi-caption-meta">Chapter 04 · Wanderlust</div>
-      </div>
-    </div>
-
-    <!-- Photo 5 -->
-    <div class="gi">
-      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-      <div class="gi-badge">— No. 05 —</div>
-      <div class="gi-expand">↗</div>
-      <!-- Replace with: <img src="photos/photo5.jpg" alt="Rajat & Ishika"> -->
-      <div class="gph"><div class="gph-n">v</div><div class="gph-l">Home</div></div>
-      <div class="gi-grad"></div><div class="gi-tint"></div>
-      <div class="gi-caption">
-        <div class="gi-caption-title">Building a home</div>
-        <div class="gi-caption-meta">Chapter 05 · Us</div>
-      </div>
-    </div>
-
-    <!-- Photo 6: Panoramic (wide bottom) -->
-    <div class="gi">
-      <div class="gi-corner tl"></div><div class="gi-corner tr"></div>
-      <div class="gi-corner bl"></div><div class="gi-corner br"></div>
-      <div class="gi-badge">— No. 06 —</div>
-      <div class="gi-expand">↗</div>
-      <!-- Replace with: <img src="photos/photo6.jpg" alt="Rajat & Ishika"> -->
-      <div class="gph"><div class="gph-n">vi</div><div class="gph-l">Forever</div></div>
-      <div class="gi-grad"></div><div class="gi-tint"></div>
-      <div class="gi-caption">
-        <div class="gi-caption-title">And finally — forever</div>
-        <div class="gi-caption-meta">Chapter 06 · The Vow</div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<footer>
-  <div class="fb">Rajat <em>&</em> Ishika</div>
-  <div class="fm">20 — 21 November 2026<br>Uday Residency · Rudrapur</div>
-</footer>
+<!-- ══════════ TOAST ══════════ -->
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script src="js/main.js"></script>
 </body>

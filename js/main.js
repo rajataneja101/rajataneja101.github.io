@@ -1,588 +1,817 @@
-/* ═════════════════════════════
-   SPLIT TEXT — char-by-char hero name reveal
-═════════════════════════════ */
-(function(){
-  document.querySelectorAll('.h-name').forEach(el=>{
-    const text=el.dataset.text;
-    const baseDelay=parseFloat(el.dataset.delay||'0');
-    el.innerHTML='';
-    [...text].forEach((c,i)=>{
-      const s=document.createElement('span');
-      s.className='ch';
-      s.textContent=c;
-      s.style.animationDelay=(baseDelay+i*0.08)+'s';
+/* ═══════════════════════════════════════════════════════════
+   RAJAT & ISHIKA · 20–21 November 2026
+   "The Marigold Thread"
+
+   ┌──────────────────────────────────────────────────┐
+   │  EVERYTHING YOU'LL WANT TO EDIT IS IN `SITE`     │
+   │  right below. Names, dates, times, phone number. │
+   └──────────────────────────────────────────────────┘
+   ═══════════════════════════════════════════════════════════ */
+
+const SITE = {
+  couple:  'Rajat & Ishika',
+  venue:   'Uday Residency, Rudrapur, Uttarakhand',
+
+  /* ── THE CEREMONIES ─────────────────────────────────────
+     Times are Indian Standard Time (UTC+5:30).             */
+  events: {
+    haldi:  { name:'Haldi',  start:'2026-11-20T11:00:00+05:30', end:'2026-11-20T15:00:00+05:30',
+              blurb:'Turmeric, laughter, and the start of something forever.' },
+    sagan:  { name:'Sagan',  start:'2026-11-20T19:00:00+05:30', end:'2026-11-20T23:30:00+05:30',
+              blurb:'Two families come together. Sweets exchanged, blessings shared.' },
+    shaadi: { name:'Shaadi', start:'2026-11-21T12:00:00+05:30', end:'2026-11-21T17:00:00+05:30',
+              blurb:'Seven steps, one fire, and everyone we love in one place.' }
+  },
+
+  /* the countdown counts down to this moment */
+  countdownTo: '2026-11-20T11:00:00+05:30'
+};
+
+/* ═══════════════ TINY HELPERS ═══════════════ */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const SVGNS = 'http://www.w3.org/2000/svg';
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+function svg(tag, attrs) {
+  const el = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+/* ═══════════════ CURTAIN — the invitation opens ═══════════════ */
+(function curtain() {
+  const c = $('#curtain');
+  if (!c) return;
+
+  // draw the mandala rays procedurally, then measure each path
+  // so the stroke-dash "draw in" animation has a real length
+  const rays = $('.cm-rays', c);
+  if (rays) {
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      const x1 = 100 + Math.cos(a) * 26, y1 = 100 + Math.sin(a) * 26;
+      const x2 = 100 + Math.cos(a) * 86, y2 = 100 + Math.sin(a) * 86;
+      rays.appendChild(svg('line', { x1, y1, x2, y2, 'stroke-opacity': i % 2 ? .35 : .8 }));
+    }
+  }
+  $$('.cm-p, .cm-rays > *', c).forEach((p, i) => {
+    const len = p.getTotalLength ? p.getTotalLength() : 200;
+    p.style.setProperty('--len', Math.ceil(len) || 200);
+    p.style.animationDelay = (i * 0.018) + 's';
+  });
+
+  const open = () => {
+    c.classList.add('done');
+    setTimeout(() => c.classList.add('gone'), 2600);
+  };
+  if (REDUCED) { c.classList.add('gone'); return; }
+  // open once fonts are ready (or after a beat, whichever first)
+  const go = () => setTimeout(open, 250);
+  if (document.fonts && document.fonts.ready) {
+    Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))]).then(go);
+  } else go();
+})();
+
+/* ═══════════════ HERO NAME — char by char ═══════════════ */
+(function splitNames() {
+  $$('.h-name').forEach(el => {
+    const text = el.dataset.text || '';
+    const base = parseFloat(el.dataset.delay || '0') + 1.05; // wait for the curtain
+    el.textContent = '';
+    [...text].forEach((c, i) => {
+      const s = document.createElement('span');
+      s.className = 'ch';
+      s.textContent = c;
+      s.style.animationDelay = (base + i * 0.075) + 's';
       el.appendChild(s);
     });
   });
 })();
 
-/* ═════════════════════════════
-   GLOBAL FLUID GRADIENT
-   - 6 blobs floating
-   - mouse influence
-   - mood shifts based on scroll section
-═════════════════════════════ */
-(function(){
-  const cv=document.getElementById('fluid'),ctx=cv.getContext('2d');
-  let W,H,t=0;
-  let mouse={x:.5,y:.5,tx:.5,ty:.5};
-  let mood={current:0,target:0};
+/* ═══════════════ MANDALA behind the hero ═══════════════ */
+(function mandala() {
+  const g = $('#mandalaG');
+  if (!g) return;
+  const C = 300;
 
-  // 3 moods — Indian wedding color story
-  const MOODS=[
-    // Haldi — turmeric, marigold, saffron
-    [
-      {color:[255,165,0],r:.55},   // marigold
-      {color:[255,110,0],r:.48},   // saffron
-      {color:[255,210,60],r:.42},  // turmeric yellow
-      {color:[230,120,20],r:.38},  // deep orange
-      {color:[255,190,80],r:.44},  // golden amber
-    ],
-    // Sagan — crimson, rani pink, deep rose
-    [
-      {color:[196,30,58],r:.55},   // crimson
-      {color:[233,30,140],r:.48},  // rani pink
-      {color:[170,20,70],r:.42},   // deep rose
-      {color:[255,60,80],r:.38},   // vivid red
-      {color:[200,80,110],r:.44},  // dusty rose
-    ],
-    // Shaadi — gold, crimson, marigold (the big day)
-    [
-      {color:[212,175,55],r:.55},  // gold
-      {color:[196,30,58],r:.48},   // crimson
-      {color:[255,160,0],r:.42},   // marigold
-      {color:[170,120,15],r:.38},  // dark gold
-      {color:[233,30,140],r:.44},  // rani pink
-    ],
+  // lotus petal, drawn as two mirrored arcs meeting at the tip
+  const petal = (angle, r0, r1, w) => {
+    const a = angle, cos = Math.cos(a), sin = Math.sin(a);
+    const px = C + cos * r0, py = C + sin * r0;
+    const tx = C + cos * r1, ty = C + sin * r1;
+    const nx = -sin * w, ny = cos * w;
+    const mid = (r0 + r1) / 2;
+    const c1x = C + cos * mid + nx, c1y = C + sin * mid + ny;
+    const c2x = C + cos * mid - nx, c2y = C + sin * mid - ny;
+    return `M${px.toFixed(1)} ${py.toFixed(1)} Q${c1x.toFixed(1)} ${c1y.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)} Q${c2x.toFixed(1)} ${c2y.toFixed(1)} ${px.toFixed(1)} ${py.toFixed(1)}Z`;
+  };
+
+  const rings = [
+    { n: 12, r0: 40,  r1: 86,  w: 15, op: .95 },
+    { n: 18, r0: 92,  r1: 140, w: 13, op: .7  },
+    { n: 24, r0: 146, r1: 196, w: 12, op: .55 },
+    { n: 36, r0: 202, r1: 246, w: 9,  op: .42 },
+    { n: 48, r0: 252, r1: 288, w: 7,  op: .3  }
   ];
 
-  let blobs=[
-    {x:.2,y:.3,vx:.0003,vy:.0002},
-    {x:.8,y:.6,vx:-.0002,vy:-.0003},
-    {x:.5,y:.5,vx:.0001,vy:.0002},
-    {x:.3,y:.8,vx:.0002,vy:-.0001},
-    {x:.7,y:.2,vx:-.0001,vy:.0002},
-  ];
+  rings.forEach((ring, ri) => {
+    const grp = svg('g', { fill: 'none', stroke: 'currentColor', 'stroke-width': 0.9, 'stroke-opacity': ring.op });
+    for (let i = 0; i < ring.n; i++) {
+      const a = (i / ring.n) * Math.PI * 2 + (ri % 2 ? Math.PI / ring.n : 0);
+      grp.appendChild(svg('path', { d: petal(a, ring.r0, ring.r1, ring.w) }));
+    }
+    g.appendChild(grp);
+  });
 
-  function resize(){
-    const dpr=Math.min(window.devicePixelRatio||1,2);
-    W=cv.width=innerWidth*dpr;H=cv.height=innerHeight*dpr;
-    cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  [44, 90, 144, 200, 250, 292].forEach((r, i) => {
+    g.appendChild(svg('circle', {
+      cx: C, cy: C, r, fill: 'none', stroke: 'currentColor',
+      'stroke-width': i % 2 ? 0.5 : 0.9, 'stroke-opacity': .5
+    }));
+  });
+})();
+
+/* ═══════════════ TORAN — marigold garland across the top ═══════════════ */
+(function toran() {
+  const el = $('.toran');
+  const s = $('#toranSvg');
+  if (!el || !s) return;
+
+  const MARIGOLD = ['#F2790C', '#FF9E1B', '#F5C542', '#E8630A', '#FFB43D'];
+  const LEAF = '#4E7A3A';
+
+  const flower = (x, y, r, color, petals = 8) => {
+    const g = svg('g', { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` });
+    for (let i = 0; i < petals; i++) {
+      g.appendChild(svg('ellipse', {
+        cx: 0, cy: -r * .52, rx: r * .42, ry: r * .58,
+        fill: color, 'fill-opacity': .92,
+        transform: `rotate(${((i / petals) * 360).toFixed(1)})`
+      }));
+    }
+    g.appendChild(svg('circle', { cx: 0, cy: 0, r: r * .34, fill: '#7A3B00', 'fill-opacity': .5 }));
+    return g;
+  };
+
+  /* Drawn in real pixels against the element's own box, so the flowers
+     stay round at every viewport width instead of being stretched. */
+  function build() {
+    const W = Math.max(320, el.clientWidth);
+    const H = Math.max(70, el.clientHeight);
+    s.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    s.setAttribute('preserveAspectRatio', 'none');
+    s.textContent = '';
+
+    const y0 = H * .06;
+    const sag = H * .40;                   // how far the middle droops
+    const ctrl = y0 + sag * 2;             // quadratic control point
+    const at = t => ({
+      x: 2 * (1 - t) * t * (W / 2) + t * t * W,
+      y: (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * ctrl + t * t * y0
+    });
+
+    s.appendChild(svg('path', {
+      d: `M0 ${y0.toFixed(1)} Q${W / 2} ${ctrl.toFixed(1)} ${W} ${y0.toFixed(1)}`,
+      fill: 'none', stroke: '#C9A227', 'stroke-width': 1.4, 'stroke-opacity': .55
+    }));
+
+    const size = W < 640 ? 6.5 : 9;                       // smaller blooms on phones
+    const N = Math.max(18, Math.round(W / 26));           // and fewer of them
+    for (let i = 0; i <= N; i++) {
+      const p = at(i / N);
+      s.appendChild(flower(p.x, p.y, size + (i % 3) * (size * .18), MARIGOLD[i % MARIGOLD.length]));
+
+      // every sixth bloom drops a strand — mango leaf and a bud
+      if (i % 6 === 3) {
+        const g = svg('g', { transform: `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})` });
+        const drop = H * .30;
+        g.appendChild(svg('path', {
+          d: `M0 ${(size * .5).toFixed(1)} L0 ${drop.toFixed(1)}`,
+          stroke: '#C9A227', 'stroke-width': 1, 'stroke-opacity': .5, fill: 'none'
+        }));
+        g.appendChild(svg('ellipse', {
+          cx: 0, cy: drop * .68, rx: size * .5, ry: drop * .36, fill: LEAF, 'fill-opacity': .55
+        }));
+        g.appendChild(flower(0, drop + size * .7, size * .74, MARIGOLD[(i + 2) % MARIGOLD.length], 6));
+        s.appendChild(g);
+      }
+    }
   }
-  resize();window.addEventListener('resize',resize);
 
-  document.addEventListener('mousemove',e=>{mouse.tx=e.clientX/innerWidth;mouse.ty=e.clientY/innerHeight;},{passive:true});
+  build();
+  let t;
+  addEventListener('resize', () => { clearTimeout(t); t = setTimeout(build, 200); });
+})();
 
-  function lerpColor(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
+/* ═══════════════ WAX SEAL on the invitation ═══════════════ */
+(function seal() {
+  const g = $('#sealG');
+  if (!g) return;
+  const ring = svg('circle', { cx: 30, cy: 30, r: 27, fill: 'currentColor', 'fill-opacity': .1, stroke: 'currentColor', 'stroke-width': 1 });
+  g.appendChild(ring);
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    g.appendChild(svg('ellipse', {
+      cx: 30 + Math.cos(a) * 27, cy: 30 + Math.sin(a) * 27,
+      rx: 4.6, ry: 3, fill: 'currentColor', 'fill-opacity': .5,
+      transform: `rotate(${(a * 180 / Math.PI).toFixed(1)} ${(30 + Math.cos(a) * 27).toFixed(2)} ${(30 + Math.sin(a) * 27).toFixed(2)})`
+    }));
+  }
+  g.appendChild(svg('circle', { cx: 30, cy: 30, r: 21, fill: 'none', stroke: 'currentColor', 'stroke-width': .6, 'stroke-opacity': .6 }));
+})();
 
-  function draw(){
-    t+=.005;
-    mouse.x+=(mouse.tx-mouse.x)*.04;
-    mouse.y+=(mouse.ty-mouse.y)*.04;
-    mood.current+=(mood.target-mood.current)*.02;
+/* ═══════════════ FLUID GRADIENT BACKGROUND ═══════════════ */
+(function fluid() {
+  const cv = $('#fluid');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, t = 0;
+  const mouse = { x: .5, y: .5, tx: .5, ty: .5 };
+  const mood = { current: 0, target: 0 };
 
-    ctx.fillStyle='#FDF6E3';
-    ctx.fillRect(0,0,W,H);
+  // one palette per ceremony — the page changes temperature as you scroll
+  const MOODS = [
+    [ // Haldi — turmeric, marigold, saffron
+      { c: [255, 165,  0], r: .55 }, { c: [255, 110,  0], r: .48 },
+      { c: [255, 210, 60], r: .42 }, { c: [230, 120, 20], r: .38 },
+      { c: [255, 190, 80], r: .44 }
+    ],
+    [ // Sagan — crimson, rani pink, deep rose
+      { c: [192,  20, 60], r: .55 }, { c: [224,  25,127], r: .48 },
+      { c: [170,  20, 70], r: .42 }, { c: [255,  60, 80], r: .38 },
+      { c: [200,  80,110], r: .44 }
+    ],
+    [ // Shaadi — gold, crimson, marigold
+      { c: [201, 162, 39], r: .55 }, { c: [192,  20, 60], r: .48 },
+      { c: [255, 160,  0], r: .42 }, { c: [170, 120, 15], r: .38 },
+      { c: [224,  25,127], r: .44 }
+    ]
+  ];
 
-    ctx.globalCompositeOperation='source-over';
+  const blobs = [
+    { x: .2, y: .3, vx:  .0003, vy:  .0002 },
+    { x: .8, y: .6, vx: -.0002, vy: -.0003 },
+    { x: .5, y: .5, vx:  .0001, vy:  .0002 },
+    { x: .3, y: .8, vx:  .0002, vy: -.0001 },
+    { x: .7, y: .2, vx: -.0001, vy:  .0002 }
+  ];
 
-    const m0=Math.floor(mood.current);
-    const m1=Math.min(m0+1,MOODS.length-1);
-    const mt=mood.current-m0;
+  function resize() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = cv.width = innerWidth * dpr;
+    H = cv.height = innerHeight * dpr;
+    cv.style.width = innerWidth + 'px';
+    cv.style.height = innerHeight + 'px';
+  }
+  resize();
+  addEventListener('resize', resize);
 
-    blobs.forEach((b,i)=>{
-      b.x+=b.vx+Math.sin(t*.7+i)*.0002;
-      b.y+=b.vy+Math.cos(t*.5+i*1.3)*.0002;
-      if(b.x<.05||b.x>.95)b.vx*=-1;
-      if(b.y<.05||b.y>.95)b.vy*=-1;
-      const mdx=(mouse.x-b.x)*.0008;
-      const mdy=(mouse.y-b.y)*.0008;
-      b.x+=mdx;b.y+=mdy;
+  if (!REDUCED) {
+    addEventListener('mousemove', e => {
+      mouse.tx = e.clientX / innerWidth;
+      mouse.ty = e.clientY / innerHeight;
+    }, { passive: true });
+  }
 
-      const conf0=MOODS[m0][i],conf1=MOODS[m1][i];
-      const color=lerpColor(conf0.color,conf1.color,mt);
-      const rBase=conf0.r+(conf1.r-conf0.r)*mt;
-      const r=(rBase+Math.sin(t*1.3+i*2)*.05)*W;
+  const mix = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
 
-      const cx=b.x*W,cy=b.y*H;
-      const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-      grad.addColorStop(0,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.22)`);
-      grad.addColorStop(.3,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.12)`);
-      grad.addColorStop(.6,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},.04)`);
-      grad.addColorStop(1,`rgba(${color[0]|0},${color[1]|0},${color[2]|0},0)`);
+  function draw() {
+    t += .005;
+    mouse.x += (mouse.tx - mouse.x) * .04;
+    mouse.y += (mouse.ty - mouse.y) * .04;
+    mood.current += (mood.target - mood.current) * .02;
 
-      ctx.fillStyle=grad;
+    ctx.fillStyle = '#FBF4E6';
+    ctx.fillRect(0, 0, W, H);
+
+    const m0 = Math.floor(mood.current);
+    const m1 = Math.min(m0 + 1, MOODS.length - 1);
+    const mt = mood.current - m0;
+
+    blobs.forEach((b, i) => {
+      b.x += b.vx + Math.sin(t * .7 + i) * .0002;
+      b.y += b.vy + Math.cos(t * .5 + i * 1.3) * .0002;
+      if (b.x < .05 || b.x > .95) b.vx *= -1;
+      if (b.y < .05 || b.y > .95) b.vy *= -1;
+      b.x += (mouse.x - b.x) * .0008;
+      b.y += (mouse.y - b.y) * .0008;
+
+      const col = mix(MOODS[m0][i].c, MOODS[m1][i].c, mt);
+      const rBase = MOODS[m0][i].r + (MOODS[m1][i].r - MOODS[m0][i].r) * mt;
+      const r = (rBase + Math.sin(t * 1.3 + i * 2) * .05) * W;
+      const cx = b.x * W, cy = b.y * H;
+      const rgb = `${col[0] | 0},${col[1] | 0},${col[2] | 0}`;
+
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      grad.addColorStop(0,  `rgba(${rgb},.22)`);
+      grad.addColorStop(.3, `rgba(${rgb},.12)`);
+      grad.addColorStop(.6, `rgba(${rgb},.04)`);
+      grad.addColorStop(1,  `rgba(${rgb},0)`);
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    ctx.globalCompositeOperation='source-over';
+    // warm vignette
+    const vg = ctx.createRadialGradient(W / 2, H / 2, W * .25, W / 2, H / 2, W * .9);
+    vg.addColorStop(0,  'rgba(251,244,230,0)');
+    vg.addColorStop(.7, 'rgba(230,200,160,.06)');
+    vg.addColorStop(1,  'rgba(200,150,80,.14)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, W, H);
 
-    // warm subtle vignette — golden-amber edges
-    ctx.globalCompositeOperation='source-over';
-    const vg=ctx.createRadialGradient(W/2,H/2,W*.25,W/2,H/2,W*.9);
-    vg.addColorStop(0,'rgba(253,246,227,0)');
-    vg.addColorStop(.7,'rgba(230,200,160,.06)');
-    vg.addColorStop(1,'rgba(200,150,80,.14)');
-    ctx.fillStyle=vg;
-    ctx.fillRect(0,0,W,H);
-
-    requestAnimationFrame(draw);
+    if (!REDUCED) requestAnimationFrame(draw);
   }
   draw();
 
-  /* ═══ SCROLL → MOOD SHIFT ═══ */
-  const sections=document.querySelectorAll('[data-blob-mood]');
-  const moodObs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        const newMood=parseInt(e.target.dataset.blobMood);
-        mood.target=newMood;
-      }
-    });
-  },{threshold:.5});
-  sections.forEach(s=>moodObs.observe(s));
-
-  // hero defaults to mood 0
+  // scroll changes the mood
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) mood.target = +e.target.dataset.mood; });
+  }, { threshold: .4 });
+  $$('[data-mood]').forEach(el => obs.observe(el));
 })();
 
-/* PROGRESS */
-window.addEventListener('scroll',()=>{
-  document.getElementById('PB').style.transform=`scaleX(${scrollY/(document.body.scrollHeight-innerHeight)})`;
-},{passive:true});
-
-/* ═════════════════════════════
-   SHOOTING STARS
-   Occasional gold meteor streaks across the hero
-═════════════════════════════ */
-(function(){
-  const cv=document.createElement('canvas');
-  cv.id='stars';
-  cv.style.cssText='position:fixed;inset:0;z-index:1;pointer-events:none;mix-blend-mode:multiply';
-  document.body.appendChild(cv);
-  const ctx=cv.getContext('2d');
-  let W,H;
-  function resize(){
-    const dpr=Math.min(devicePixelRatio||1,2);
-    W=cv.width=innerWidth*dpr;H=cv.height=innerHeight*dpr;
-    cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
-  }
-  resize();window.addEventListener('resize',resize);
-
-  let meteors=[];
-  function spawn(){
-    const fromLeft=Math.random()>.5;
-    const angle=fromLeft?(Math.PI*.18):(Math.PI*.82);  // ~30deg from horizontal
-    const speed=8+Math.random()*4;
-    meteors.push({
-      x:fromLeft?-100:W+100,
-      y:Math.random()*H*.5,
-      vx:Math.cos(angle)*speed*(fromLeft?1:-1),
-      vy:Math.sin(angle)*speed,
-      life:1,
-      decay:.008+Math.random()*.005,
-      tail:[],
-      hue:Math.random()<.4?'196,30,58':Math.random()<.6?'212,140,0':'180,100,20',
-    });
-  }
-
-  let lastSpawn=0;
-  function tick(t){
-    ctx.clearRect(0,0,W,H);
-    if(t-lastSpawn>3500+Math.random()*4000){spawn();lastSpawn=t;}
-
-    meteors=meteors.filter(m=>{
-      m.x+=m.vx;m.y+=m.vy;m.life-=m.decay;
-      m.tail.unshift({x:m.x,y:m.y});
-      if(m.tail.length>22)m.tail.pop();
-
-      if(m.life<=0||m.x<-200||m.x>W+200||m.y>H+200)return false;
-
-      // tail
-      for(let i=0;i<m.tail.length;i++){
-        const p=m.tail[i];
-        const o=(1-i/m.tail.length)*m.life*.7;
-        const sz=(1-i/m.tail.length)*3+.5;
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,sz,0,Math.PI*2);
-        ctx.fillStyle=`rgba(${m.hue},${o})`;
-        ctx.fill();
-      }
-      // head glow
-      const glow=ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,30);
-      glow.addColorStop(0,`rgba(${m.hue},${m.life*.8})`);
-      glow.addColorStop(1,`rgba(${m.hue},0)`);
-      ctx.fillStyle=glow;
-      ctx.beginPath();
-      ctx.arc(m.x,m.y,30,0,Math.PI*2);
-      ctx.fill();
-
-      return true;
-    });
-
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-})();
-
-/* ═════════════════════════════
-   SCROLL PARALLAX on hero text
-   names drift up + fade as you scroll past
-═════════════════════════════ */
-(function(){
-  const stage=document.querySelector('.hero-stage');
-  const tag=document.querySelector('.h-tag');
-  const floorL=document.querySelector('.h-floor-l');
-  const floorR=document.querySelector('.h-floor-r');
-  if(!stage)return;
-  window.addEventListener('scroll',()=>{
-    const y=scrollY;
-    if(y>innerHeight)return;
-    const p=y/innerHeight;
-    stage.style.transform=`translateY(${y*.4}px)`;
-    stage.style.opacity=Math.max(0,1-p*1.4);
-    if(tag){tag.style.transform=`translateX(-50%) translateY(${-y*.2}px)`;tag.style.opacity=Math.max(0,1-p*2);}
-    if(floorL){floorL.style.transform=`translateY(${y*.15}px)`;floorL.style.opacity=Math.max(0,1-p*1.5);}
-    if(floorR){floorR.style.transform=`translateY(${y*.15}px)`;floorR.style.opacity=Math.max(0,1-p*1.5);}
-  },{passive:true});
-})();
-
-/* ═════════════════════════════
-   MAGNETIC BUTTONS — attract to cursor
-═════════════════════════════ */
-document.querySelectorAll('.h-cta').forEach(btn=>{
-  btn.addEventListener('mousemove',e=>{
-    const r=btn.getBoundingClientRect();
-    const x=e.clientX-r.left-r.width/2;
-    const y=e.clientY-r.top-r.height/2;
-    btn.style.transform=`translate(${x*.25}px,${y*.35}px) scale(1.05)`;
-  });
-  btn.addEventListener('mouseleave',()=>{btn.style.transform='';});
-});
-
-/* ═════════════════════════════
-   PETAL BURST on click anywhere
-   Click and a small handful of marigold petals
-   blooms from the click point, falls with physics
-═════════════════════════════ */
-(function(){
-  const cv=document.createElement('canvas');
-  cv.id='petals';
-  cv.style.cssText='position:fixed;inset:0;z-index:9996;pointer-events:none';
-  document.body.appendChild(cv);
-  const ctx=cv.getContext('2d');
-  let W,H;
-  function resize(){
-    const dpr=Math.min(devicePixelRatio||1,2);
-    W=cv.width=innerWidth*dpr;H=cv.height=innerHeight*dpr;
-    cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
-  }
-  resize();window.addEventListener('resize',resize);
-
-  let petals=[];
-  const COLORS=['#FF8C00','#C41E3A','#E91E8C','#D4AF37','#FF6B35','#FFD700','#FF4040','#FF9500','#B8860B'];
-
-  function burst(x,y,count=14){
-    const dpr=Math.min(devicePixelRatio||1,2);
-    x*=dpr;y*=dpr;
-    for(let i=0;i<count;i++){
-      const angle=Math.random()*Math.PI*2;
-      const speed=2+Math.random()*5;
-      petals.push({
-        x,y,
-        vx:Math.cos(angle)*speed,
-        vy:Math.sin(angle)*speed-3,
-        rot:Math.random()*Math.PI*2,
-        vrot:(Math.random()-.5)*.2,
-        r:6+Math.random()*8,
-        color:COLORS[Math.floor(Math.random()*COLORS.length)],
-        life:1,
-        decay:.008+Math.random()*.005,
-        gravity:.15,
-      });
-    }
-  }
-
-  document.addEventListener('click',e=>{
-    // skip clicks on lightbox controls, links inside gallery items
-    if(e.target.closest('.lbb,#LB,.gi,.h-cta'))return;
-    burst(e.clientX,e.clientY);
-  },{passive:true});
-
-  function tick(){
-    ctx.clearRect(0,0,W,H);
-    petals=petals.filter(p=>{
-      p.vy+=p.gravity;
-      p.vx*=.99;
-      p.x+=p.vx;p.y+=p.vy;
-      p.rot+=p.vrot;
-      p.life-=p.decay;
-      if(p.life<=0||p.y>H+40)return false;
-
-      ctx.save();
-      ctx.translate(p.x,p.y);
-      ctx.rotate(p.rot);
-      ctx.globalAlpha=p.life;
-      ctx.fillStyle=p.color;
-      ctx.beginPath();
-      ctx.ellipse(0,0,p.r*.7,p.r,0,0,Math.PI*2);
-      ctx.fill();
-      // inner highlight
-      ctx.fillStyle='rgba(255,255,255,.3)';
-      ctx.beginPath();
-      ctx.ellipse(-p.r*.15,-p.r*.2,p.r*.25,p.r*.4,0,0,Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-      return true;
-    });
-    requestAnimationFrame(tick);
-  }
-  tick();
-
-  // welcome burst at hero center after page settles
-  setTimeout(()=>{
-    if(scrollY<100){
-      burst(innerWidth/2,innerHeight*.45,22);
-    }
-  },2500);
-
-  // expose globally so blessing overlay can use it
-  window.__petalBurst=burst;
-  window.__petalShower=function(){
-    // dense, slow shower from across the top
-    const count=80;
-    for(let i=0;i<count;i++){
-      setTimeout(()=>{
-        const x=Math.random()*innerWidth;
-        burst(x,-20,3);
-      },i*40);
-    }
+/* ═══════════════ COUNTDOWN ═══════════════ */
+(function countdown() {
+  const root = $('#countdown');
+  if (!root) return;
+  const target = new Date(SITE.countdownTo).getTime();
+  const cells = {
+    days:  $('[data-cd="days"]',  root),
+    hours: $('[data-cd="hours"]', root),
+    mins:  $('[data-cd="mins"]',  root),
+    secs:  $('[data-cd="secs"]',  root)
   };
-})();
+  const note = $('#cdNote');
+  const last = {};
 
-/* ═════════════════════════════
-   BLESSING OVERLAY — the big moment
-═════════════════════════════ */
-(function(){
-  const overlay=document.getElementById('bless-overlay');
-  const openBtn=document.getElementById('blessBtn');
-  const closeBtn=document.getElementById('blessClose');
-  if(!overlay||!openBtn)return;
-
-  function open(){
-    overlay.classList.add('open');
-    document.body.style.overflow='hidden';
-    // trigger the epic petal shower
-    setTimeout(()=>{if(window.__petalShower)window.__petalShower();},300);
-  }
-  function close(){
-    overlay.classList.add('fading');
-    setTimeout(()=>{
-      overlay.classList.remove('open','fading');
-      document.body.style.overflow='';
-    },600);
-  }
-
-  openBtn.addEventListener('click',open);
-  closeBtn.addEventListener('click',close);
-  overlay.addEventListener('click',e=>{
-    if(e.target===overlay)close();
-  });
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'&&overlay.classList.contains('open'))close();
-  });
-})();
-
-/* ═════════════════════════════
-   PERIODIC TEXT SHIMMER on hero names
-   Every ~12s, a wave of light passes across the names
-═════════════════════════════ */
-(function(){
-  const names=document.querySelectorAll('.h-name');
-  if(!names.length)return;
-  function shimmer(el){
-    const chars=[...el.querySelectorAll('.ch')];
-    if(!chars.length)return;
-    chars.forEach(ch=>{
-      ch.style.transition='background-position 1.8s ease-in-out';
-      ch.style.background='linear-gradient(110deg,#2D0000 0%,#2D0000 28%,#FF8C00 42%,#C41E3A 50%,#FF8C00 58%,#2D0000 72%,rgba(45,0,0,.7) 100%)';
-      ch.style.backgroundSize='300% 100%';
-      ch.style.backgroundPosition='200% 50%';
-      ch.style.webkitBackgroundClip='text';
-      ch.style.webkitTextFillColor='transparent';
-      ch.style.backgroundClip='text';
-    });
-    requestAnimationFrame(()=>{
-      chars.forEach(ch=>{ ch.style.backgroundPosition='-100% 50%'; });
-    });
-    setTimeout(()=>{
-      chars.forEach(ch=>{
-        ch.style.background='linear-gradient(180deg,#2D0000 0%,#6B0010 55%,rgba(139,0,30,.7) 100%)';
-        ch.style.backgroundSize='';
-        ch.style.backgroundPosition='';
-        ch.style.webkitBackgroundClip='text';
-        ch.style.webkitTextFillColor='transparent';
-        ch.style.backgroundClip='text';
-        ch.style.transition='';
-      });
-    },2000);
-  }
-  function loop(){
-    const delay=8000+Math.random()*6000;
-    setTimeout(()=>{
-      if(scrollY<innerHeight*.7){
-        names.forEach((el,i)=>setTimeout(()=>shimmer(el),i*250));
-      }
-      loop();
-    },delay);
-  }
-  setTimeout(loop,5000);
-})();
-
-/* ═════════════════════════════
-   DOUBLE-CLICK EASTER EGG
-   Double-click the ampersand → big petal burst from it
-═════════════════════════════ */
-(function(){
-  const amp=document.querySelector('.h-amp');
-  if(!amp)return;
-  amp.style.cursor='pointer';
-  amp.addEventListener('dblclick',e=>{
-    const r=amp.getBoundingClientRect();
-    const cx=r.left+r.width/2;
-    const cy=r.top+r.height/2;
-    if(window.__petalBurst){
-      window.__petalBurst(cx,cy,40);
+  function set(key, val) {
+    const el = cells[key];
+    if (!el) return;
+    const str = String(val).padStart(2, '0');
+    if (last[key] === str) return;
+    last[key] = str;
+    el.textContent = str;
+    if (!REDUCED) {
+      el.classList.remove('tick');
+      void el.offsetWidth;      // restart the animation
+      el.classList.add('tick');
     }
-  });
-  // single click also gives a small burst
-  amp.addEventListener('click',e=>{
-    const r=amp.getBoundingClientRect();
-    if(window.__petalBurst){
-      window.__petalBurst(r.left+r.width/2,r.top+r.height/2,16);
+  }
+
+  function render() {
+    let d = target - Date.now();
+    if (d <= 0) {
+      // the wedding is happening (or has happened)
+      const over = Date.now() - new Date(SITE.events.shaadi.end).getTime();
+      Object.keys(cells).forEach(k => { last[k] = null; set(k, 0); });
+      if (note) note.textContent = over > 0
+        ? 'Married. Thank you for being there.'
+        : 'It’s happening — right now.';
+      return;
     }
-    e.stopPropagation();
-  });
+    const s = Math.floor(d / 1000);
+    set('days',  Math.floor(s / 86400));
+    set('hours', Math.floor(s % 86400 / 3600));
+    set('mins',  Math.floor(s % 3600 / 60));
+    set('secs',  s % 60);
+  }
+  render();
+  setInterval(render, 1000);
 })();
 
-/* ═════════════════════════════
-   GALLERY SCROLL PARALLAX
-   Images shift gently as you scroll past
-═════════════════════════════ */
-(function(){
-  const tiles=document.querySelectorAll('.gi');
-  if(!tiles.length)return;
-  function update(){
-    const vh=innerHeight;
-    tiles.forEach(t=>{
-      const r=t.getBoundingClientRect();
-      if(r.bottom<0||r.top>vh)return;
-      // calculate how far through the viewport this tile is (0 entering, 1 leaving)
-      const progress=(r.top+r.height/2)/vh;
-      const offset=(progress-.5)*30; // -15px to +15px
-      const inner=t.querySelector('.gph, img');
-      if(inner){
-        inner.style.transform=`translateY(${offset}px) scale(1.08)`;
-      }
+/* ═══════════════ THE THREAD — draws down the page ═══════════════ */
+(function thread() {
+  const path = $('#thread-draw');
+  const rail = $('#thread');
+  if (!path || !rail) return;
+
+  const sections = $$('[data-thread]');
+  const len = path.getTotalLength();
+  path.style.strokeDasharray = len;
+  path.style.strokeDashoffset = len;
+
+  // one knot per named section, spaced evenly down the rail.
+  // They live in a box that matches #thread, so a % here always lines up
+  // with the drawn path — including on phones, where the two differ in width.
+  const holder = document.createElement('div');
+  holder.id = 'thread-knots';
+  holder.setAttribute('aria-hidden', 'true');
+  rail.insertAdjacentElement('afterend', holder);
+
+  const knots = sections.map((sec, i) => {
+    const k = document.createElement('div');
+    k.className = 'thread-knot';
+    k.style.top = ((i + .5) / sections.length * 100) + '%';
+    k.innerHTML = `<span class="tk-dot"></span><span class="tk-lab"></span>`;
+    $('.tk-lab', k).textContent = sec.dataset.thread;
+    holder.appendChild(k);
+    return { el: k, sec };
+  });
+
+  let active = -1;
+  function update() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? clamp(scrollY / max, 0, 1) : 0;
+    path.style.strokeDashoffset = len * (1 - p);
+
+    // whichever named section owns the middle of the viewport wins
+    const mid = innerHeight / 2;
+    let best = -1, bestDist = Infinity;
+    knots.forEach((k, i) => {
+      const r = k.sec.getBoundingClientRect();
+      if (r.top > innerHeight || r.bottom < 0) return;
+      const dist = Math.abs((r.top + r.height / 2) - mid);
+      if (dist < bestDist) { bestDist = dist; best = i; }
     });
-    requestAnimationFrame(update);
+    if (best !== active) {
+      knots.forEach((k, i) => k.el.classList.toggle('on', i <= best));
+      active = best;
+    }
   }
   update();
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
 })();
 
-/* ═════════════════════════════
-   GALLERY 3D TILT (overrides default)
-   Mouse-track perspective on each tile
-═════════════════════════════ */
-document.querySelectorAll('.gi').forEach(tile=>{
-  tile.addEventListener('mousemove',e=>{
-    const r=tile.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-.5;
-    const y=(e.clientY-r.top)/r.height-.5;
-    tile.style.transform=`perspective(1200px) rotateY(${x*6}deg) rotateX(${-y*6}deg) translateZ(20px)`;
-  });
-  tile.addEventListener('mouseleave',()=>{
-    tile.style.transform='';
-  });
-});
+/* ═══════════════ PROGRESS BAR ═══════════════ */
+addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const pb = $('#PB');
+  if (pb) pb.style.transform = `scaleX(${max > 0 ? clamp(scrollY / max, 0, 1) : 0})`;
+}, { passive: true });
 
-/* ═════════════════════════════
-   AMBIENT HOVER on story bignums
-   The huge "20" / "21" digits respond to cursor
-═════════════════════════════ */
-document.querySelectorAll('.story-bignum').forEach(num=>{
-  const section=num.closest('.story-section');
-  if(!section)return;
-  section.addEventListener('mousemove',e=>{
-    const r=section.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-.5;
-    const y=(e.clientY-r.top)/r.height-.5;
-    num.style.transform=`translate(${x*30}px,${y*20}px)`;
-    num.style.transition='transform .4s cubic-bezier(.23,1,.32,1)';
-  });
-  section.addEventListener('mouseleave',()=>{num.style.transform='';});
-});
+/* ═══════════════ NAV — sticky state, active link, mobile ═══════════════ */
+(function nav() {
+  const bar = $('#NAV');
+  const toggle = $('#navToggle');
+  if (!bar) return;
 
-/* REVEAL */
-const ro=new IntersectionObserver(entries=>{
-  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('on'),i*80);ro.unobserve(e.target);}});
-},{threshold:.07});
-document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+  addEventListener('scroll', () => {
+    bar.classList.toggle('stuck', scrollY > 40);
+  }, { passive: true });
 
-/* LIGHTBOX */
-const LB=document.getElementById('LB'),LBi=document.getElementById('LBi'),LBc=document.getElementById('LBc');
-const LBtitle=document.getElementById('LB-info-title'),LBmeta=document.getElementById('LB-info-meta');
-let ci=0;
-function tiles(){return[...document.querySelectorAll('#GG .gi')];}
-function tileImage(t){return t.querySelector('img');}
-function tileCaption(t){
-  const title=t.querySelector('.gi-caption-title');
-  const meta=t.querySelector('.gi-caption-meta');
-  return {title:title?title.textContent:'',meta:meta?meta.textContent:''};
-}
-function imgs(){return tiles().map(tileImage).filter(Boolean);}
-function showLB(idx){
-  const all=tiles();
-  const withImgs=all.filter(t=>tileImage(t));
-  if(!withImgs.length){
-    // no real images - still show the placeholder info
-    const t=all[idx];
-    if(!t)return;
-    const cap=tileCaption(t);
-    LBi.style.display='none';
-    LBtitle.textContent=cap.title||('Photo '+(idx+1));
-    LBmeta.textContent=cap.meta||'Coming soon';
-    LBc.textContent=(idx+1)+' / '+all.length;
-    return;
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const open = bar.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    $$('.nlinks a', bar).forEach(a => a.addEventListener('click', () => {
+      bar.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }));
   }
-  const t=withImgs[idx];
-  const img=tileImage(t);
-  const cap=tileCaption(t);
-  LBi.style.display='';
-  LBi.src=img.src;LBi.alt=img.alt||cap.title;
-  LBtitle.textContent=cap.title;
-  LBmeta.textContent=cap.meta;
-  LBc.textContent=(idx+1)+' / '+withImgs.length;
+
+  // highlight the section you're looking at
+  const links = $$('.nlinks a');
+  const map = new Map();
+  links.forEach(a => {
+    const sec = $(a.getAttribute('href'));
+    if (sec) map.set(sec, a);
+  });
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      const a = map.get(e.target);
+      if (a && e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        a.classList.add('active');
+      }
+    });
+  }, { threshold: .3 });
+  map.forEach((_, sec) => obs.observe(sec));
+})();
+
+/* ═══════════════ REVEAL ON SCROLL ═══════════════ */
+(function reveal() {
+  const ro = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('on');
+      ro.unobserve(e.target);
+    });
+  }, { threshold: .08, rootMargin: '0px 0px -8% 0px' });
+  $$('.rv').forEach(el => ro.observe(el));
+
+  // the footer knot ties itself once it comes into view
+  const knot = $('.knot');
+  if (knot) {
+    const p = $('#knotPath');
+    if (p) {
+      const l = Math.ceil(p.getTotalLength());
+      knot.style.setProperty('--klen', l);
+    }
+    new IntersectionObserver((es, o) => {
+      es.forEach(e => { if (e.isIntersecting) { knot.classList.add('on'); o.disconnect(); } });
+    }, { threshold: .5 }).observe(knot);
+  }
+})();
+
+/* ═══════════════ HERO PARALLAX ═══════════════ */
+(function heroParallax() {
+  if (REDUCED) return;
+  const stage = $('.hero-stage');
+  const toranEl = $('.toran');
+  const fl = $('.h-floor-l'), fr = $('.h-floor-r'), sc = $('.h-scroll');
+  if (!stage) return;
+  let raf = 0;
+  addEventListener('scroll', () => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const y = scrollY;
+      if (y > innerHeight * 1.2) return;
+      const p = y / innerHeight;
+      stage.style.transform = `translateY(${y * .34}px)`;
+      stage.style.opacity = Math.max(0, 1 - p * 1.35);
+      if (toranEl) toranEl.style.transform = `translateY(${-y * .55}px)`;
+      [fl, fr, sc].forEach(el => {
+        if (!el) return;
+        el.style.opacity = Math.max(0, 1 - p * 2.2);
+      });
+    });
+  }, { passive: true });
+})();
+
+/* ═══════════════ MAGNETIC BUTTONS ═══════════════ */
+if (!REDUCED && matchMedia('(hover:hover)').matches) {
+  $$('.h-cta').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width / 2;
+      const y = e.clientY - r.top - r.height / 2;
+      btn.style.transform = `translate(${x * .18}px,${y * .28}px) scale(1.04)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
 }
-function openLB(i){
-  ci=i;
-  showLB(ci);
-  LB.classList.add('open');document.body.style.overflow='hidden';
+
+/* ═══════════════ INVITATION CARD — the flap opens ═══════════════ */
+(function invite() {
+  const card = $('#inviteCard');
+  const flap = $('.ic-flap', card || document);
+  if (!card || !flap) return;
+
+  let opened = false;
+  function open() {
+    if (opened) return;
+    opened = true;
+    card.classList.add('open');
+  }
+  flap.addEventListener('click', open);
+  flap.setAttribute('role', 'button');
+  flap.setAttribute('tabindex', '0');
+  flap.removeAttribute('aria-hidden');
+  flap.setAttribute('aria-label', 'Open the invitation');
+  flap.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  });
+
+  // if you scroll past it without tapping, it opens on its own
+  new IntersectionObserver((es, o) => {
+    es.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(() => { if (!opened) open(); }, 1400);
+        o.disconnect();
+      }
+    });
+  }, { threshold: .55 }).observe(card);
+  if (REDUCED) open();
+})();
+
+/* ═══════════════ STORY — big numerals follow the cursor ═══════════════ */
+if (!REDUCED && matchMedia('(hover:hover)').matches) {
+  $$('.story-bignum').forEach(num => {
+    const sec = num.closest('.story-section');
+    if (!sec) return;
+    sec.addEventListener('mousemove', e => {
+      const r = sec.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      num.style.transition = 'transform .5s cubic-bezier(.23,1,.32,1)';
+      num.style.transform = `translate(${x * 26}px,${y * 16}px)`;
+    });
+    sec.addEventListener('mouseleave', () => { num.style.transform = ''; });
+  });
 }
-function closeLB(){LB.classList.remove('open');document.body.style.overflow='';}
-function navLB(d){
-  const count=tiles().filter(t=>tileImage(t)).length || tiles().length;
-  ci=(ci+d+count)%count;showLB(ci);
+
+/* ═══════════════ GALLERY — parallax, tilt, lightbox ═══════════════ */
+(function gallery() {
+  const grid = $('#GG');
+  if (!grid) return;
+  const tiles = $$('.gi', grid);
+
+  const count = $('#gCount');
+  if (count) count.textContent = String(tiles.length).padStart(2, '0');
+
+  /* gentle parallax inside each frame, only while it's on screen */
+  if (!REDUCED) {
+    let visible = new Set();
+    const vis = new IntersectionObserver(es => {
+      es.forEach(e => e.isIntersecting ? visible.add(e.target) : visible.delete(e.target));
+    });
+    tiles.forEach(t => vis.observe(t));
+
+    let raf = 0;
+    const shift = () => {
+      raf = 0;
+      visible.forEach(t => {
+        const r = t.getBoundingClientRect();
+        const p = (r.top + r.height / 2) / innerHeight;
+        const inner = t.querySelector('img, .gph');
+        if (inner) inner.style.transform = `translateY(${(p - .5) * 26}px) scale(1.08)`;
+      });
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(shift); }, { passive: true });
+    shift();
+  }
+
+  /* 3D tilt on hover */
+  if (!REDUCED && matchMedia('(hover:hover)').matches) {
+    tiles.forEach(t => {
+      t.addEventListener('mousemove', e => {
+        const r = t.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        t.style.transform = `perspective(1200px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg) translateZ(16px)`;
+      });
+      t.addEventListener('mouseleave', () => { t.style.transform = ''; });
+    });
+  }
+
+  /* ── lightbox ── */
+  const LB = $('#LB'), LBi = $('#LBi'), LBph = $('#LBph'), LBc = $('#LBc');
+  const LBt = $('#LB-info-title'), LBm = $('#LB-info-meta');
+  let idx = 0, lastFocus = null;
+
+  function show(i) {
+    idx = (i + tiles.length) % tiles.length;
+    const t = tiles[idx];
+    const img = t.querySelector('img');
+    const title = t.querySelector('.gi-caption-title');
+    const meta  = t.querySelector('.gi-caption-meta');
+
+    if (img) {
+      LBi.src = img.currentSrc || img.src;
+      LBi.alt = img.alt || (title ? title.textContent : '');
+      LBi.style.display = '';
+      LBph.classList.remove('show');
+    } else {
+      // no photo dropped in yet — show the placeholder card instead
+      LBi.style.display = 'none';
+      LBi.removeAttribute('src');
+      LBph.classList.add('show');
+      LBph.textContent = 'This photograph is still being taken.';
+    }
+    LBt.textContent = title ? title.textContent : `Photo ${idx + 1}`;
+    LBm.textContent = meta ? meta.textContent : '';
+    LBc.textContent = `${String(idx + 1).padStart(2, '0')} / ${String(tiles.length).padStart(2, '0')}`;
+  }
+
+  function open(i) {
+    lastFocus = document.activeElement;
+    show(i);
+    LB.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    $('#LBx').focus();
+  }
+  function close() {
+    LB.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lastFocus) lastFocus.focus();
+  }
+
+  tiles.forEach((t, i) => {
+    t.setAttribute('role', 'button');
+    t.setAttribute('tabindex', '0');
+    t.addEventListener('click', () => open(i));
+    t.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
+    });
+  });
+
+  $('#LBx').addEventListener('click', close);
+  $('#LBp').addEventListener('click', () => show(idx - 1));
+  $('#LBn').addEventListener('click', () => show(idx + 1));
+  LB.addEventListener('click', e => { if (e.target === LB) close(); });
+
+  addEventListener('keydown', e => {
+    if (!LB.classList.contains('open')) return;
+    if (e.key === 'Escape')     close();
+    if (e.key === 'ArrowLeft')  show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+
+  /* swipe on touch */
+  let sx = 0, sy = 0;
+  LB.addEventListener('touchstart', e => {
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, { passive: true });
+  LB.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) show(idx + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+})();
+
+/* ═══════════════ ADD TO CALENDAR (.ics) ═══════════════ */
+(function calendar() {
+  const stamp = d => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+
+  function vevent(key, ev) {
+    return [
+      'BEGIN:VEVENT',
+      `UID:${key}-rajat-ishika-2026@rajatwedsishika.life`,
+      `DTSTAMP:${stamp(Date.now())}`,
+      `DTSTART:${stamp(ev.start)}`,
+      `DTEND:${stamp(ev.end)}`,
+      `SUMMARY:${ev.name} — ${SITE.couple}`,
+      `DESCRIPTION:${ev.blurb}`,
+      `LOCATION:${SITE.venue}`,
+      'END:VEVENT'
+    ].join('\r\n');
+  }
+
+  function build(which) {
+    const keys = which === 'all' ? Object.keys(SITE.events) : [which];
+    const body = keys.filter(k => SITE.events[k]).map(k => vevent(k, SITE.events[k]));
+    if (!body.length) return null;
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//rajatwedsishika.life//Wedding//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      ...body,
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  $$('[data-ics]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const which = btn.dataset.ics;
+      const ics = build(which);
+      if (!ics) return;
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = which === 'all' ? 'rajat-ishika-wedding.ics' : `rajat-ishika-${which}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      toast(which === 'all'
+        ? 'All three ceremonies saved to your calendar.'
+        : `${SITE.events[which].name} saved to your calendar.`);
+    });
+  });
+})();
+
+/* clipboard, with a fallback for older browsers */
+function copy(text) {
+  if (navigator.clipboard && isSecureContext) {
+    return navigator.clipboard.writeText(text).then(() => true, () => false);
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return Promise.resolve(ok);
+  } catch { return Promise.resolve(false); }
 }
-document.getElementById('GG').addEventListener('click',e=>{
-  const t=e.target.closest('.gi');
-  if(!t)return;
-  const all=tiles();
-  openLB(all.indexOf(t));
-});
-document.getElementById('LBx').onclick=closeLB;
-document.getElementById('LBp').onclick=()=>navLB(-1);
-document.getElementById('LBn').onclick=()=>navLB(1);
-LB.addEventListener('click',e=>{if(e.target===LB)closeLB();});
-document.addEventListener('keydown',e=>{if(!LB.classList.contains('open'))return;if(e.key==='Escape')closeLB();if(e.key==='ArrowLeft')navLB(-1);if(e.key==='ArrowRight')navLB(1);});
+
+/* ═══════════════ SHARE ═══════════════ */
+(function share() {
+  const btn = $('#shareBtn');
+  if (!btn) return;
+  const data = {
+    title: `${SITE.couple} — 20–21 November 2026`,
+    text:  `${SITE.couple} are getting married! Join us on 20–21 November 2026 at ${SITE.venue}.`,
+    url:   location.href.split('#')[0]
+  };
+  btn.addEventListener('click', () => {
+    if (navigator.share) {
+      navigator.share(data).catch(() => {});
+    } else {
+      copy(`${data.text}\n${data.url}`).then(ok =>
+        toast(ok ? 'Invite link copied — go on, forward it.' : data.url));
+    }
+  });
+})();
