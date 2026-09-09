@@ -26,7 +26,6 @@
 
   --serif:'Instrument Serif',Georgia,serif;
   --sans:'Inter',system-ui,-apple-system,sans-serif;
-  --deva:'Tiro Devanagari Hindi','Instrument Serif',serif;
 
   --ease:cubic-bezier(.16,1,.3,1);
   --ease-io:cubic-bezier(.65,0,.35,1);
@@ -69,6 +68,12 @@ body{
 
 :focus-visible{outline:2px solid var(--crimson);outline-offset:3px;border-radius:4px}
 
+/* ═══════════════ FEATURE FLAGS ═══════════════ */
+/* Hidden until main.js sees the matching flag in the URL. Kept in CSS so a
+   flagged-off section never flashes before the script runs; main.js drops the
+   attribute to reveal, or removes the element entirely. */
+[data-flag]{display:none!important}
+
 /* ═══════════════ AMBIENT LAYERS ═══════════════ */
 #fluid{position:fixed;inset:0;z-index:0;pointer-events:none}
 #grain{
@@ -88,7 +93,13 @@ body{
   height:100vh;height:100svh;          /* svh keeps the last knot clear of mobile browser chrome */
   z-index:6;pointer-events:none;
 }
-#thread-knots{z-index:7}
+#thread-knots{
+  z-index:7;
+  /* inset the knot band so the first label clears the nav and the garland,
+     and the last one stays off the bottom edge */
+  top:22vh;top:22svh;
+  height:72vh;height:72svh;
+}
 #thread path{fill:none;stroke-linecap:round}
 #thread-track{stroke:var(--ink-08);stroke-width:1}
 #thread-draw{
@@ -153,7 +164,7 @@ body{
 }
 @keyframes drawIn{to{stroke-dashoffset:0}}
 .curtain-word{
-  font-family:var(--deva);font-size:19px;letter-spacing:.16em;padding-left:.16em;
+  font-family:var(--serif);font-style:italic;font-size:19px;letter-spacing:.16em;padding-left:.16em;
   color:var(--maroon);opacity:0;animation:fadeIn .8s ease forwards .55s;
 }
 #curtain.done .curtain-half.left{transform:translateX(-101%)}
@@ -252,7 +263,7 @@ nav#NAV.open .nav-toggle span:last-child{transform:translateY(-3px) rotate(-45de
 /* शुभ विवाह gets its own line so it sits dead centre, flanked by hairlines */
 .h-tag-deva{
   display:inline-flex;align-items:center;gap:14px;
-  font-family:var(--deva);font-size:clamp(14px,1.5vw,17px);
+  font-family:var(--serif);font-style:italic;font-size:clamp(14px,1.5vw,17px);
   letter-spacing:.08em;color:var(--crimson);
   padding-left:.08em;               /* offsets the trailing letter-space */
 }
@@ -401,7 +412,8 @@ nav#NAV.open .nav-toggle span:last-child{transform:translateY(-3px) rotate(-45de
   font-variant-numeric:tabular-nums;
   opacity:0;animation:fadeIn 1s ease forwards 2.8s;
 }
-.h-floor-l{left:var(--gutter)}
+.h-floor-l{left:var(--gutter);display:none}   /* only shown once day1 (Haldi/Sagan) is flagged on */
+html.day1 .h-floor-l{display:block}
 .h-floor-r{right:var(--gutter)}
 
 .h-scroll{
@@ -498,7 +510,7 @@ section{position:relative;z-index:2}
 .ic-corner.br{bottom:16px;right:16px;border-left:0;border-top:0}
 
 .ic-om{
-  font-family:var(--deva);font-size:clamp(13px,1.4vw,16px);
+  font-family:var(--serif);font-style:italic;font-size:clamp(13px,1.4vw,16px);
   color:var(--crimson);letter-spacing:.05em;margin-bottom:22px;
 }
 .ic-eyebrow{
@@ -590,10 +602,6 @@ section{position:relative;z-index:2}
   font-size:clamp(50px,8.2vw,116px);line-height:1;letter-spacing:-.03em;
   color:var(--maroon);display:flex;align-items:baseline;gap:.4em;flex-wrap:wrap;
 }
-.story-deva{
-  font-family:var(--deva);font-size:clamp(18px,2.2vw,30px);
-  color:var(--gold);letter-spacing:0;
-}
 .story-meta{
   margin-top:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-60);
@@ -603,6 +611,11 @@ section{position:relative;z-index:2}
   margin-top:24px;font-family:var(--serif);
   font-size:clamp(17px,1.9vw,23px);line-height:1.62;color:var(--ink-60);
   max-width:44ch;
+}
+.story-note{
+  margin-top:18px;max-width:44ch;
+  font-size:13.5px;line-height:1.7;color:var(--ink-45);
+  padding-left:16px;border-left:1px solid var(--gold-soft);
 }
 .story-dress{
   margin-top:30px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
@@ -778,8 +791,9 @@ section{position:relative;z-index:2}
   will-change:transform;
   box-shadow:0 14px 40px -22px rgba(107,0,24,.3);
 }
-.gi[data-span="wide"]{grid-column:span 3;aspect-ratio:16/10}
-.gi[data-span="tall"]{grid-column:span 2;aspect-ratio:2/3}
+.gi[data-span="hero"],
+.gi[data-span="wide"]{grid-column:span 4;aspect-ratio:16/10}
+.gi[data-span="half"]{grid-column:span 3;aspect-ratio:2/3}
 .gi:hover{box-shadow:0 30px 60px -26px rgba(107,0,24,.44);z-index:3}
 
 .gi img,.gph{
@@ -850,7 +864,8 @@ section{position:relative;z-index:2}
 
 @media (max-width:860px){
   .gg{grid-template-columns:repeat(2,1fr);gap:10px}
-  .gi,.gi[data-span="wide"],.gi[data-span="tall"]{grid-column:span 1;aspect-ratio:3/4}
+  .gi,.gi[data-span="half"]{grid-column:span 1;aspect-ratio:3/4}
+  .gi[data-span="hero"],
   .gi[data-span="wide"]{grid-column:span 2;aspect-ratio:16/11}
 }
 

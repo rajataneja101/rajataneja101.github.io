@@ -71,15 +71,19 @@ Two lines per tile, both in the `<figcaption>`, both shown in the lightbox:
 
 Tile shape is set by one attribute:
 
-| Attribute | Shape | Width on desktop |
-|---|---|---|
-| *(none)* | portrait 3:4 | ⅓ of the row |
-| `data-span="wide"` | landscape 16:10 | ½ of the row |
-| `data-span="tall"` | portrait 2:3 | ⅓ of the row |
+| Attribute | Shape | Columns (of 6) | Best for |
+|---|---|---|---|
+| `data-span="hero"` | landscape 16:10 | 4 | your strongest landscape |
+| `data-span="wide"` | landscape 16:10 | 4 | landscape |
+| *(none)* | portrait 3:4 | 2 | portrait |
+| `data-span="half"` | portrait 2:3 | 3 | full-length portrait |
 
-The grid is six columns, so a `wide` tile plus a normal one fills a row neatly.
-Match the attribute to the photo's real orientation — a portrait shot in a
-`wide` slot gets cropped hard.
+The grid is six columns and the current six tiles tile it exactly — `4+2`,
+`2+4`, `3+3` — so there are no gaps. If you change a span, keep each row
+adding up to 6 or you will get a hole.
+
+Match the attribute to the photo's real orientation. A full-length portrait in
+a `wide` slot gets cropped to a letterbox strip and you lose the outfit.
 
 ## Adding a seventh photo
 

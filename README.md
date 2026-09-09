@@ -14,6 +14,33 @@ photos/             drop your photographs here
 
 ---
 
+## 0. Who sees what — the link you actually send
+
+The plain link — `https://rajatwedsishika.life/` — shows **only the Anand
+Karaj on 21 November**: the invitation, that one ceremony, venue & travel.
+No mention of the 20th anywhere on the page, not even in the browser tab
+title or the countdown.
+
+Haldi, Sagan, and the photo gallery are each held behind their own flag in
+the URL, and none of them turn on by accident — you have to name it:
+
+| Add this to the link | Shows |
+|---|---|
+| `?haldi` | + Haldi (20 Nov) |
+| `?sagan` | + Sagan (20 Nov) |
+| `?photos` | + the gallery |
+| `?haldi&sagan&photos` | any combination — just chain them |
+| `?all` | everything, all at once |
+
+So **`https://rajatwedsishika.life/?haldi&sagan`** is the link for family who
+are part of the full two days, and **`https://rajatwedsishika.life/?all`** is
+the one for yourselves while you're checking the page.
+
+The countdown, the "Add to calendar" button, and every date on the page
+(hero, invitation, venue, footer) automatically match whichever ceremonies
+are actually showing — you don't need to edit anything per link, just choose
+which flags to send.
+
 ## 1. Ceremony times and venue
 
 Open `js/main.js`. The first ~30 lines are a `SITE` object holding the couple,

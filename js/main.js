@@ -16,15 +16,15 @@ const SITE = {
      Times are Indian Standard Time (UTC+5:30).             */
   events: {
     haldi:  { name:'Haldi',  start:'2026-11-20T11:00:00+05:30', end:'2026-11-20T15:00:00+05:30',
-              blurb:'Turmeric, laughter, and the start of something forever.' },
+              blurb:'Turmeric, laughter, and the start of something forever.',
+              note:'until the first tilak of turmeric' },
     sagan:  { name:'Sagan',  start:'2026-11-20T19:00:00+05:30', end:'2026-11-20T23:30:00+05:30',
-              blurb:'Two families come together. Sweets exchanged, blessings shared.' },
-    shaadi: { name:'Shaadi', start:'2026-11-21T12:00:00+05:30', end:'2026-11-21T17:00:00+05:30',
-              blurb:'Seven steps, one fire, and everyone we love in one place.' }
-  },
-
-  /* the countdown counts down to this moment */
-  countdownTo: '2026-11-20T11:00:00+05:30'
+              blurb:'Two families come together. Sweets exchanged, blessings shared.',
+              note:'until the sagan begins' },
+    shaadi: { name:'Anand Karaj', start:'2026-11-21T12:00:00+05:30', end:'2026-11-21T17:00:00+05:30',
+              blurb:'Four laavan around the Guru Granth Sahib, and everyone we love in one room.',
+              note:'until the Anand Karaj begins' }
+  }
 };
 
 /* ═══════════════ TINY HELPERS ═══════════════ */
@@ -49,6 +49,47 @@ function toast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
 }
+
+/* ═══════════════ FEATURE FLAGS ═══════════════ */
+/* Anything tagged data-flag="x" in the HTML shows up only when the URL asks:
+     ?sagan           the Sagan ceremony
+     ?photos          the gallery
+     ?sagan&photos    both
+     ?all             everything
+   Whatever is not asked for is removed from the DOM outright, so the scroll
+   thread, the colour moods, the nav and the gallery code never see it.
+   Runs first, before any other block below. */
+(function flags() {
+  const q = new URLSearchParams(location.search);
+  const on = name => q.has('all') || q.has(name);
+  $$('[data-flag]').forEach(el => {
+    if (on(el.dataset.flag)) el.removeAttribute('data-flag');   // CSS reveals it
+    else el.remove();
+  });
+
+  // Haldi and Sagan are both the 20th. Guests who only get a plain link are
+  // invited to the 21st only, so the *default* page must never mention the
+  // 20th anywhere — not just skip the Haldi/Sagan sections. Everything below
+  // only runs for the minority of links that carry ?haldi, ?sagan or ?all.
+  const day1 = on('haldi') || on('sagan');
+  document.documentElement.classList.toggle('day1', day1);
+  if (!day1) return;
+
+  document.title = 'Rajat & Ishika — 20·21 November 2026';
+  const desc = $('meta[name="description"]');
+  if (desc) desc.setAttribute('content',
+    'Rajat & Ishika are getting married. Haldi, Sagan and the Anand Karaj — 20 to 21 November 2026 at Uday Residency, Rudrapur. Ceremonies, travel and gallery.');
+
+  const heroNum = $('#heroDateNum');       if (heroNum) heroNum.textContent = '20 — 21';
+  const inviteWhen = $('#inviteWhen');     if (inviteWhen) inviteWhen.textContent = '20 & 21 November 2026';
+  const karajDay = $('#karajDayWrap');     if (karajDay) karajDay.hidden = false;
+  const footerDates = $('#footerDates');   if (footerDates) footerDates.textContent = '20 — 21 November 2026';
+
+  const vm1 = $('[data-vm="1"]');
+  if (vm1) { $('.vm-label', vm1).textContent = 'From'; $('.vm-val', vm1).textContent = '20 Nov'; }
+  const vm2 = $('[data-vm="2"]');
+  if (vm2) { $('.vm-label', vm2).textContent = 'To';   $('.vm-val', vm2).textContent = '21 Nov'; }
+})();
 
 /* ═══════════════ CURTAIN — the invitation opens ═══════════════ */
 (function curtain() {
@@ -188,13 +229,15 @@ function toast(msg) {
     }));
 
     const size = W < 640 ? 6.5 : 9;                       // smaller blooms on phones
-    const N = Math.max(18, Math.round(W / 26));           // and fewer of them
+    const half = Math.max(9, Math.round(W / 52));         // and fewer of them
+    const N = half * 2;                                   // even, so one bloom sits dead centre
     for (let i = 0; i <= N; i++) {
       const p = at(i / N);
-      s.appendChild(flower(p.x, p.y, size + (i % 3) * (size * .18), MARIGOLD[i % MARIGOLD.length]));
+      const d = Math.abs(i - half);                       // rings out from the middle
+      s.appendChild(flower(p.x, p.y, size + (d % 3) * (size * .18), MARIGOLD[d % MARIGOLD.length]));
 
-      // every sixth bloom drops a strand — mango leaf and a bud
-      if (i % 6 === 3) {
+      // strands mirror outwards from the centre bloom, so the garland hangs even
+      if (d % 6 === 0) {
         const g = svg('g', { transform: `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})` });
         const drop = H * .30;
         g.appendChild(svg('path', {
@@ -204,7 +247,7 @@ function toast(msg) {
         g.appendChild(svg('ellipse', {
           cx: 0, cy: drop * .68, rx: size * .5, ry: drop * .36, fill: LEAF, 'fill-opacity': .55
         }));
-        g.appendChild(flower(0, drop + size * .7, size * .74, MARIGOLD[(i + 2) % MARIGOLD.length], 6));
+        g.appendChild(flower(0, drop + size * .7, size * .74, MARIGOLD[(d + 2) % MARIGOLD.length], 6));
         s.appendChild(g);
       }
     }
@@ -348,7 +391,16 @@ function toast(msg) {
 (function countdown() {
   const root = $('#countdown');
   if (!root) return;
-  const target = new Date(SITE.countdownTo).getTime();
+
+  // whichever flagged-in ceremony comes first chronologically drives the
+  // countdown — Anand Karaj by default, or Haldi/Sagan when their flag is on
+  const visible = $$('[data-event]')
+    .map(el => el.dataset.event)
+    .filter(k => SITE.events[k])
+    .sort((a, b) => new Date(SITE.events[a].start) - new Date(SITE.events[b].start));
+  const key = visible[0] || 'shaadi';
+  const target = new Date(SITE.events[key].start).getTime();
+
   const cells = {
     days:  $('[data-cd="days"]',  root),
     hours: $('[data-cd="hours"]', root),
@@ -356,6 +408,7 @@ function toast(msg) {
     secs:  $('[data-cd="secs"]',  root)
   };
   const note = $('#cdNote');
+  if (note) note.textContent = SITE.events[key].note;
   const last = {};
 
   function set(key, val) {
@@ -745,7 +798,15 @@ if (!REDUCED && matchMedia('(hover:hover)').matches) {
   }
 
   function build(which) {
-    const keys = which === 'all' ? Object.keys(SITE.events) : [which];
+    // "all" means the ceremonies actually on the page — a flagged-off one
+    // should not turn up in the calendar file either
+    let keys;
+    if (which === 'all') {
+      keys = $$('[data-event]').map(el => el.dataset.event).filter(k => SITE.events[k]);
+      if (!keys.length) keys = Object.keys(SITE.events);
+    } else {
+      keys = [which];
+    }
     const body = keys.filter(k => SITE.events[k]).map(k => vevent(k, SITE.events[k]));
     if (!body.length) return null;
     return [
