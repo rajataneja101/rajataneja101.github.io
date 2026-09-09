@@ -71,7 +71,7 @@ function toast(msg) {
   // invited to the 21st only, so the *default* page must never mention the
   // 20th anywhere — not just skip the Haldi/Sagan sections. Everything below
   // only runs for the minority of links that carry ?haldi, ?sagan or ?all.
-  const day1 = on('haldi') || on('sagan');
+  const day1 = on('day1');   // Haldi and Sagan are both the 20th — one flag for both
   document.documentElement.classList.toggle('day1', day1);
   if (!day1) return;
 

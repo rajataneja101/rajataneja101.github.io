@@ -26,15 +26,14 @@ the URL, and none of them turn on by accident — you have to name it:
 
 | Add this to the link | Shows |
 |---|---|
-| `?haldi` | + Haldi (20 Nov) |
-| `?sagan` | + Sagan (20 Nov) |
+| `?day1` | + Haldi and Sagan (both 20 Nov) |
 | `?photos` | + the gallery |
-| `?haldi&sagan&photos` | any combination — just chain them |
+| `?day1&photos` | both, chained together |
 | `?all` | everything, all at once |
 
-So **`https://rajatwedsishika.life/?haldi&sagan`** is the link for family who
-are part of the full two days, and **`https://rajatwedsishika.life/?all`** is
-the one for yourselves while you're checking the page.
+So **`https://rajatwedsishika.life/?day1`** is the link for family who are
+part of the full two days, and **`https://rajatwedsishika.life/?all`** is the
+one for yourselves while you're checking the page.
 
 The countdown, the "Add to calendar" button, and every date on the page
 (hero, invitation, venue, footer) automatically match whichever ceremonies
