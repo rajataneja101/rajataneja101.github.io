@@ -303,42 +303,46 @@ function toast(msg) {
   g.appendChild((() => { const h = svg('g', { transform: `translate(${C} ${C})` }); h.appendChild(flower(30, 10)); return h; })());
 })();
 
-/* ═══════════════ SAGAN BACKDROP — a circle of dancing figures ═══════════════ */
+/* ═══════════════ SAGAN BACKDROP — fireworks over the evening ═══════════════ */
 (function saganBg() {
   const g = $('#bgSagan');
   if (!g) return;
-  const C = 300;
 
-  // one abstracted dancer — both arms thrown up, one leg kicked out —
-  // mirrored on alternating positions for a lively, not-quite-symmetric feel.
-  // Every figure stays upright (only a small tilt, never rotated to face the
-  // ring's centre) so the whole thing reads as people, not a pinwheel.
-  function dancer(mirror) {
-    const m = mirror ? -1 : 1;
-    const d = svg('g', { fill: 'none', stroke: 'currentColor', 'stroke-width': 2.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
-    d.appendChild(svg('circle', { cx: 0, cy: -36, r: 8.5, fill: 'none', stroke: 'currentColor', 'stroke-width': 2.6 })); // head
-    d.appendChild(svg('path', { d: `M0,-27 L${3*m},0` }));                                  // spine, a slight lean
-    d.appendChild(svg('path', { d: `M${1*m},-22 L${18*m},-38 L${26*m},-32` }));              // raised arm, elbow bent up
-    d.appendChild(svg('path', { d: `M${1*m},-22 L${-16*m},-36 L${-24*m},-30` }));            // other arm, up too
-    d.appendChild(svg('path', { d: `M${3*m},0 L${18*m},22 L${16*m},30` }));                  // kicked leg, bent at the knee
-    d.appendChild(svg('path', { d: `M${3*m},0 L${-10*m},26` }));                             // standing leg
-    return d;
+  // one burst: a bright core, long primary rays and shorter in-between rays
+  // (so it reads as an exploding firework, not a spoked wheel), each ray
+  // tipped with a small spark. A faint rising trail hints at the rocket.
+  function burst(cx, cy, r, rays, opacity, launchFrom) {
+    const holder = svg('g', { opacity });
+    const stroke = (attrs) => svg('path', { fill: 'none', stroke: 'currentColor', 'stroke-linecap': 'round', ...attrs });
+
+    if (launchFrom) {
+      holder.appendChild(stroke({
+        d: `M${launchFrom.x},${launchFrom.y} Q${(launchFrom.x + cx) / 2 + 6},${(launchFrom.y + cy) / 2} ${cx},${cy}`,
+        'stroke-width': 1.4, 'stroke-opacity': .45, 'stroke-dasharray': '1 5'
+      }));
+    }
+
+    for (let i = 0; i < rays; i++) {
+      const a = (i / rays) * 360;
+      const rad = a * Math.PI / 180;
+      const long = i % 2 === 0;
+      const rr = long ? r : r * .58;
+      const x1 = cx + Math.cos(rad) * r * .16, y1 = cy + Math.sin(rad) * r * .16;
+      const x2 = cx + Math.cos(rad) * rr, y2 = cy + Math.sin(rad) * rr;
+      holder.appendChild(stroke({
+        d: `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)}`,
+        'stroke-width': long ? 2 : 1.3, 'stroke-opacity': long ? .9 : .6
+      }));
+      holder.appendChild(svg('circle', { cx: x2.toFixed(1), cy: y2.toFixed(1), r: long ? 2.6 : 1.6, fill: 'currentColor', 'fill-opacity': long ? .9 : .55 }));
+    }
+    holder.appendChild(svg('circle', { cx, cy, r: 5, fill: 'currentColor' }));
+    return holder;
   }
 
-  const N = 9, R = 200;
-  for (let i = 0; i < N; i++) {
-    const a = (i / N) * 360 - 90;
-    const rad = a * Math.PI / 180;
-    const x = C + Math.cos(rad) * R, y = C + Math.sin(rad) * R;
-    const holder = svg('g', {
-      transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${i % 2 ? 9 : -9}) scale(1.3)`,
-      opacity: i % 2 ? .8 : 1
-    });
-    holder.appendChild(dancer(i % 2 === 0));
-    g.appendChild(holder);
-  }
-  // the circle they're dancing around
-  g.appendChild(svg('circle', { cx: C, cy: C, r: R - 46, fill: 'none', stroke: 'currentColor', 'stroke-width': .6, 'stroke-opacity': .5 }));
+  g.appendChild(burst(160, 150, 78, 14, 1,   { x: 160, y: 560 }));
+  g.appendChild(burst(430, 120, 56, 12, .8,  { x: 430, y: 560 }));
+  g.appendChild(burst(320, 260, 92, 16, .5,  null));
+  g.appendChild(burst(495, 300, 42, 10, .65, { x: 495, y: 560 }));
 })();
 
 /* ═══════════════ ANAND KARAJ BACKDROP — a Gurudwara silhouette ═══════════════ */
