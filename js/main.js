@@ -258,6 +258,138 @@ function toast(msg) {
   addEventListener('resize', () => { clearTimeout(t); t = setTimeout(build, 200); });
 })();
 
+/* ═══════════════ HALDI BACKDROP — a wreath of marigolds ═══════════════ */
+(function haldiBg() {
+  const g = $('#bgHaldi');
+  if (!g) return;
+  const C = 300;
+
+  // same two shapes as the toran garland, drawn at a fixed size and
+  // positioned by transform instead of by coordinate math
+  const flower = (r, petals = 8) => {
+    const gr = svg('g');
+    for (let i = 0; i < petals; i++) {
+      gr.appendChild(svg('ellipse', {
+        cx: 0, cy: -r * .52, rx: r * .42, ry: r * .58,
+        fill: 'currentColor', 'fill-opacity': .85,
+        transform: `rotate(${((i / petals) * 360).toFixed(1)})`
+      }));
+    }
+    gr.appendChild(svg('circle', { cx: 0, cy: 0, r: r * .34, fill: 'none', stroke: 'currentColor', 'stroke-width': 1, 'stroke-opacity': .8 }));
+    return gr;
+  };
+  const leaf = (r) => svg('ellipse', {
+    cx: 0, cy: 0, rx: r * .4, ry: r, fill: 'none', stroke: 'currentColor', 'stroke-width': 1, 'stroke-opacity': .6
+  });
+
+  // two rings — a dense inner wreath, a sparser outer ring of leaves —
+  // echo the mandala's ring structure without repeating its lotus motif
+  const RINGS = [
+    { n: 14, r: 150, size: 15, kind: 'flower' },
+    { n: 20, r: 235, size: 11, kind: 'leaf' }
+  ];
+  RINGS.forEach(ring => {
+    for (let i = 0; i < ring.n; i++) {
+      const a = (i / ring.n) * 360;
+      const rad = a * Math.PI / 180;
+      const x = C + Math.cos(rad) * ring.r, y = C + Math.sin(rad) * ring.r;
+      const node = ring.kind === 'flower' ? flower(ring.size) : leaf(ring.size);
+      const holder = svg('g', { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(a + 90).toFixed(1)})` });
+      holder.appendChild(node);
+      g.appendChild(holder);
+    }
+  });
+  // a small central bloom the wreath surrounds
+  g.appendChild((() => { const h = svg('g', { transform: `translate(${C} ${C})` }); h.appendChild(flower(30, 10)); return h; })());
+})();
+
+/* ═══════════════ SAGAN BACKDROP — a circle of dancing figures ═══════════════ */
+(function saganBg() {
+  const g = $('#bgSagan');
+  if (!g) return;
+  const C = 300;
+
+  // one abstracted dancer — both arms thrown up, one leg kicked out —
+  // mirrored on alternating positions for a lively, not-quite-symmetric feel.
+  // Every figure stays upright (only a small tilt, never rotated to face the
+  // ring's centre) so the whole thing reads as people, not a pinwheel.
+  function dancer(mirror) {
+    const m = mirror ? -1 : 1;
+    const d = svg('g', { fill: 'none', stroke: 'currentColor', 'stroke-width': 2.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+    d.appendChild(svg('circle', { cx: 0, cy: -36, r: 8.5, fill: 'none', stroke: 'currentColor', 'stroke-width': 2.6 })); // head
+    d.appendChild(svg('path', { d: `M0,-27 L${3*m},0` }));                                  // spine, a slight lean
+    d.appendChild(svg('path', { d: `M${1*m},-22 L${18*m},-38 L${26*m},-32` }));              // raised arm, elbow bent up
+    d.appendChild(svg('path', { d: `M${1*m},-22 L${-16*m},-36 L${-24*m},-30` }));            // other arm, up too
+    d.appendChild(svg('path', { d: `M${3*m},0 L${18*m},22 L${16*m},30` }));                  // kicked leg, bent at the knee
+    d.appendChild(svg('path', { d: `M${3*m},0 L${-10*m},26` }));                             // standing leg
+    return d;
+  }
+
+  const N = 9, R = 200;
+  for (let i = 0; i < N; i++) {
+    const a = (i / N) * 360 - 90;
+    const rad = a * Math.PI / 180;
+    const x = C + Math.cos(rad) * R, y = C + Math.sin(rad) * R;
+    const holder = svg('g', {
+      transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${i % 2 ? 9 : -9}) scale(1.3)`,
+      opacity: i % 2 ? .8 : 1
+    });
+    holder.appendChild(dancer(i % 2 === 0));
+    g.appendChild(holder);
+  }
+  // the circle they're dancing around
+  g.appendChild(svg('circle', { cx: C, cy: C, r: R - 46, fill: 'none', stroke: 'currentColor', 'stroke-width': .6, 'stroke-opacity': .5 }));
+})();
+
+/* ═══════════════ ANAND KARAJ BACKDROP — a Gurudwara silhouette ═══════════════ */
+/* Kept to plain architecture — dome, arch, a bare pennant on the flagpole —
+   rather than rendering the Khanda, which is a specific religious emblem. */
+(function karajBg() {
+  const g = $('#bgKaraj');
+  if (!g) return;
+  const stroke = (attrs) => svg('path', { fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', ...attrs });
+
+  const CX = 300, BASE = 430, W = 200, WALL_H = 130;
+  const L = CX - W / 2, R = CX + W / 2, TOP = BASE - WALL_H;
+
+  // main hall + arched doorway
+  g.appendChild(stroke({ d: `M${L},${BASE} L${L},${TOP} L${CX},${TOP - 34} L${R},${TOP} L${R},${BASE}` }));
+  g.appendChild(stroke({ d: `M${CX-30},${BASE} L${CX-30},${TOP+38} Q${CX},${TOP+10} ${CX+30},${TOP+38} L${CX+30},${BASE}` }));
+  g.appendChild(stroke({ d: `M${L},${BASE} L${R},${BASE}` }));
+
+  // central dome on a drum, with a finial
+  const domeR = 46;
+  g.appendChild(stroke({ d: `M${CX-52},${TOP-34} L${CX-52},${TOP-58} L${CX+52},${TOP-58} L${CX+52},${TOP-34}` })); // drum
+  g.appendChild(svg('path', {
+    d: `M${CX-52},${TOP-58} Q${CX-52},${TOP-58-domeR} ${CX},${TOP-58-domeR} Q${CX+52},${TOP-58-domeR} ${CX+52},${TOP-58}`,
+    fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round'
+  }));
+  g.appendChild(stroke({ d: `M${CX},${TOP-58-domeR} L${CX},${TOP-58-domeR-22}` }));                 // finial post
+  g.appendChild(svg('circle', { cx: CX, cy: TOP-58-domeR-26, r: 5, fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }));
+
+  // two smaller flanking domes, echoing common Gurudwara roofline rhythm
+  [-1, 1].forEach(side => {
+    const cx = CX + side * 92, top = TOP - 6, r = 22;
+    g.appendChild(stroke({ d: `M${cx-24},${top} L${cx-24},${top-16} L${cx+24},${top-16} L${cx+24},${top}` }));
+    g.appendChild(svg('path', {
+      d: `M${cx-24},${top-16} Q${cx-24},${top-16-r} ${cx},${top-16-r} Q${cx+24},${top-16-r} ${cx+24},${top-16}`,
+      fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round'
+    }));
+    g.appendChild(stroke({ d: `M${cx},${top-16-r} L${cx},${top-16-r-10}` }));
+  });
+
+  // flagpole with a plain triangular pennant, set beside the hall
+  const fx = R + 34, fTop = TOP - 150;
+  g.appendChild(stroke({ d: `M${fx},${BASE} L${fx},${fTop}` }));
+  g.appendChild(svg('path', {
+    d: `M${fx},${fTop} L${fx+34},${fTop+16} L${fx},${fTop+32}Z`,
+    fill: 'currentColor', 'fill-opacity': .5, stroke: 'currentColor', 'stroke-width': 1.5
+  }));
+
+  // low steps at the base, and a ground line running the width of the motif
+  g.appendChild(stroke({ d: `M${L-14},${BASE+12} L${R+14},${BASE+12}` }));
+})();
+
 /* ═══════════════ WAX SEAL on the invitation ═══════════════ */
 (function seal() {
   const g = $('#sealG');
