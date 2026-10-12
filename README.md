@@ -30,6 +30,7 @@ the URL, and none of them turn on by accident — you have to name it:
 | `?photos` | + the gallery |
 | `?day1&photos` | both, chained together |
 | `?all` | everything, all at once |
+| `?bride` | bride's side: names read "Ishika & Rajat" everywhere (not included in `?all`) |
 
 So **`https://rajatwedsishika.life/?day1`** is the link for family who are
 part of the full two days, and **`https://rajatwedsishika.life/?all`** is the

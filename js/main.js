@@ -56,12 +56,36 @@ function toast(msg) {
      ?photos          the gallery
      ?sagan&photos    both
      ?all             everything
+     ?bride           bride's side: "Ishika & Rajat" instead of "Rajat & Ishika"
+                      (an ordering switch, not a section — ?all does not turn it on)
    Whatever is not asked for is removed from the DOM outright, so the scroll
    thread, the colour moods, the nav and the gallery code never see it.
    Runs first, before any other block below. */
 (function flags() {
   const q = new URLSearchParams(location.search);
   const on = name => q.has('all') || q.has(name);
+
+  // Bride's side sees the names the other way round, everywhere.
+  const bride = q.has('bride');
+  const names = bride ? 'Ishika & Rajat' : 'Rajat & Ishika';
+  if (bride) {
+    SITE.couple = names;
+    const text = (sel, fn) => $$(sel).forEach(fn);
+    document.title = document.title.replace('Rajat &amp; Ishika', 'Ishika & Rajat').replace('Rajat & Ishika', 'Ishika & Rajat');
+    $$('meta[name="description"], meta[property="og:title"]').forEach(m =>
+      m.setAttribute('content', m.getAttribute('content').replace('Rajat & Ishika', 'Ishika & Rajat')));
+    text('.nlogo', a => {
+      a.setAttribute('aria-label', 'Ishika and Rajat — home');
+      const [r, i] = $$('span', a); if (r && i) { r.textContent = 'I'; i.textContent = 'R'; }
+    });
+    text('h1.sr-only', h => { h.textContent = 'Ishika and Rajat are getting married'; });
+    const hn = $$('.h-name');                       // hero names, before they are split into letters
+    if (hn.length === 2) { hn[0].dataset.text = 'Ishika'; hn[1].dataset.text = 'Rajat'; }
+    const icn = $$('.ic-names span');               // invitation card
+    if (icn.length === 2) { icn[0].textContent = 'Ishika'; icn[1].textContent = 'Rajat'; }
+    text('.ic-sign', e => { e.innerHTML = '— Ishika &amp; Rajat'; });
+    text('.fb', e => { e.innerHTML = 'Ishika <em>&amp;</em> Rajat'; });
+  }
   $$('[data-flag]').forEach(el => {
     if (on(el.dataset.flag)) el.removeAttribute('data-flag');   // CSS reveals it
     else el.remove();
@@ -75,10 +99,10 @@ function toast(msg) {
   document.documentElement.classList.toggle('day1', day1);
   if (!day1) return;
 
-  document.title = 'Rajat & Ishika — 20·21 November 2026';
+  document.title = names + ' — 20·21 November 2026';
   const desc = $('meta[name="description"]');
   if (desc) desc.setAttribute('content',
-    'Rajat & Ishika are getting married. Haldi, Sagan and the Anand Karaj — 20 to 21 November 2026 at Uday Residency, Rudrapur. Ceremonies, travel and gallery.');
+    names + ' are getting married. Haldi, Sagan and the Anand Karaj — 20 to 21 November 2026 at Uday Residency, Rudrapur. Ceremonies, travel and gallery.');
 
   const heroNum = $('#heroDateNum');       if (heroNum) heroNum.textContent = '20 — 21';
   const inviteWhen = $('#inviteWhen');     if (inviteWhen) inviteWhen.textContent = '20 & 21 November 2026';
