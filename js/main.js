@@ -18,7 +18,7 @@ const SITE = {
     haldi:  { name:'Haldi',  start:'2026-11-20T11:00:00+05:30', end:'2026-11-20T15:00:00+05:30',
               blurb:'Turmeric, laughter, and the start of something forever.',
               note:'until the first tilak of turmeric' },
-    sagan:  { name:'Sagan',  start:'2026-11-20T19:00:00+05:30', end:'2026-11-20T23:30:00+05:30',
+    sagan:  { name:'Sagan',  start:'2026-11-20T18:00:00+05:30', end:'2026-11-20T23:30:00+05:30',
               blurb:'Two families come together. Sweets exchanged, blessings shared.',
               note:'until the sagan begins' },
     shaadi: { name:'Anand Karaj', start:'2026-11-21T12:00:00+05:30', end:'2026-11-21T17:00:00+05:30',
@@ -74,6 +74,7 @@ function toast(msg) {
     document.title = document.title.replace('Rajat &amp; Ishika', 'Ishika & Rajat').replace('Rajat & Ishika', 'Ishika & Rajat');
     $$('meta[name="description"], meta[property="og:title"]').forEach(m =>
       m.setAttribute('content', m.getAttribute('content').replace('Rajat & Ishika', 'Ishika & Rajat')));
+    text('.ic-seal span', e => { e.textContent = 'I&R'; });   // wax seal on the closed card
     text('.nlogo', a => {
       a.setAttribute('aria-label', 'Ishika and Rajat — home');
       const [r, i] = $$('span', a); if (r && i) { r.textContent = 'I'; i.textContent = 'R'; }
@@ -552,13 +553,8 @@ function toast(msg) {
   const root = $('#countdown');
   if (!root) return;
 
-  // whichever flagged-in ceremony comes first chronologically drives the
-  // countdown — Anand Karaj by default, or Haldi/Sagan when their flag is on
-  const visible = $$('[data-event]')
-    .map(el => el.dataset.event)
-    .filter(k => SITE.events[k])
-    .sort((a, b) => new Date(SITE.events[a].start) - new Date(SITE.events[b].start));
-  const key = visible[0] || 'shaadi';
+  // always counts down to the Anand Karaj, whatever flags are on
+  const key = 'shaadi';
   const target = new Date(SITE.events[key].start).getTime();
 
   const cells = {
